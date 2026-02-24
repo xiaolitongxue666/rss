@@ -4,6 +4,7 @@
 .husky
 .idea
 .vscode
+clash-aio
 Dockerfile*
 LICENSE
 Procfile
@@ -19,6 +20,9 @@ test
 .dockerignore
 .editorconfig
 .env
+.env.bak
+.env.stack
+.env.stack.example
 .eslint*
 .gitignore
 .gitpod.yml

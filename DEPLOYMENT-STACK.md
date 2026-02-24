@@ -1,0 +1,133 @@
+# RSS + Clash 栈部署说明
+
+本栈将 RSSHub（本仓库自建镜像）、Redis、Clash（由 clash-aio 项目构建）与 Subconverter 统一编排：RSSHub 通过内网使用 Clash 代理访问外网，国内源直连；Cookie 等通过环境变量配置。
+
+### 快速开始
+
+1. 克隆并初始化 submodule：`git clone --recurse-submodules <rss-repo-url>`，或克隆后执行 `git submodule update --init clash-aio`。
+2. 复制 `.env.stack.example` 为 `.env`，填写 **RAW_SUB_URL**（必填）及可选 CLASH_AIO_PATH、Cookie。
+3. 在 rss 项目根目录执行：`./scripts/stack-build-and-up.sh`。
+
+---
+
+## 结构示意
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ 宿主机                                                        │
+│  1200 → rsshub │ 25501 → subconverter（栈内） │ Clash 不映射   │
+└─────────────────────────────────────────────────────────────┘
+         │
+         ▼
+┌─────────────────┐     ┌──────────────────┐     ┌─────────────────────┐
+│ rss-stack-rsshub │────▶│ rss-stack-redis  │     │ rss-stack-subconverter│
+│ 1200             │     │ 6379             │     │ 25500（宿主机 25501）  │
+└────────┬─────────┘     └──────────────────┘     └──────────┬──────────┘
+         │ PROXY_HOST=clash-with-ui:7890                     │
+         ▼                                                   ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│ rss-stack-clash-with-ui（clash-aio 构建）  代理 7890 / 控制 9090 仅内网   │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 一、构建说明
+
+### 1.1 克隆与 clash-aio（submodule）
+
+本仓库将 **clash-aio 作为 git submodule** 放在 `./clash-aio`，默认即用该路径，无需再配 CLASH_AIO_PATH。
+
+- **首次克隆**：`git clone --recurse-submodules <rss-repo-url>`，或克隆后执行 `git submodule update --init clash-aio`。
+- **若使用本机其他位置的 clash-aio**：在 `.env` 中设置 `CLASH_AIO_PATH=../clash-aio` 或 `../../Proxy/clash-aio` 等任意有效路径即可。
+
+### 1.2 环境准备（.env）
+
+- 复制 `.env.stack.example` 为 `.env`，填写：
+  - **RAW_SUB_URL**：Clash 订阅链接（必填）。
+  - **CLASH_AIO_PATH**：默认 `./clash-aio`（submodule）；若 clash-aio 在别处，改为对应相对或绝对路径。
+  - 可选 **BUILD_PROXY**：构建时代理，如 `http://host.docker.internal:7890`。
+  - 可选 **BILIBILI_COOKIE_<uid>**、**WEIBO_COOKIES** 等，见 [docs/install/COOKIE.md](docs/install/COOKIE.md)。
+
+**预检查脚本**：执行 `./scripts/stack-pre-install.sh` 可自动创建 `.env`（若缺失）、在常见位置检测 clash-aio 并写入 CLASH_AIO_PATH；`stack-build-and-up.sh` 会先调用该脚本（可通过 `SKIP_PRE_INSTALL=1` 跳过）。
+
+### 1.3 一键构建并启动
+
+在 **rss 项目根目录** 执行：
+
+```bash
+./scripts/stack-build-and-up.sh
+```
+
+脚本会：执行 pre-install 检查 → 加载 `.env` 并校验 CLASH_AIO_PATH → 构建 clash-with-ui 与 rsshub 镜像 → 启动四个容器 → 等待 RSSHub 端口 1200 就绪。
+
+### 1.4 仅启动（已构建过）
+
+若镜像已存在，只需启动：
+
+```bash
+# 若未在 .env 中设置，需先 export
+export CLASH_AIO_PATH=/path/to/clash-aio
+docker compose -f docker-compose.stack.yml up -d
+# 或
+docker-compose -f docker-compose.stack.yml up -d
+```
+
+### 1.5 仅重新构建
+
+```bash
+export CLASH_AIO_PATH=/path/to/clash-aio   # 若需
+docker compose -f docker-compose.stack.yml build
+# 或
+docker-compose -f docker-compose.stack.yml build
+```
+
+---
+
+## 二、使用说明（如何用 RSSHub 获取 RSS）
+
+RSSHub **通过 URL 提供订阅**，无需在后台“添加订阅列表”。
+
+1. **基地址**：本栈 RSSHub 地址为 **`http://127.0.0.1:1200`**（或你映射的域名/端口）。
+2. **订阅方式**：在任意 RSS 阅读器（Feedly、Inoreader、Fluent Reader 等）中「添加订阅」，填入 **`http://127.0.0.1:1200/<路由路径>`** 即可。
+3. **路由路径从哪查**：
+   - 官方路由文档：[docs.rsshub.app](https://docs.rsshub.app)（按站点与类型查路径与示例）。
+   - 示例：B 站用户投稿路径为 `/bilibili/user/video/:uid`，则订阅地址为 `http://127.0.0.1:1200/bilibili/user/video/2267573`；知乎热榜为 `http://127.0.0.1:1200/zhihu/hotlist`。
+4. **需要登录的路由**（如 B 站关注、微博时间线）：在 `.env` 中配置对应 Cookie 后重启 rsshub 容器，再在阅读器中添加上述格式的 URL 即可。
+
+更多参数（过滤、全文等）见 [docs/parameter](https://docs.rsshub.app/parameter) 或本仓库 `docs/parameter.md`。
+
+---
+
+## 三、环境变量摘要
+
+| 变量 | 说明 |
+|------|------|
+| `CLASH_AIO_PATH` | clash-aio 目录路径，用于构建与 subconverter 卷挂载 |
+| `RAW_SUB_URL` | Clash 订阅地址（clash-with-ui 启动时拉取） |
+| `BUILD_PROXY` | 可选，构建时代理，如 `http://host.docker.internal:7890` |
+| `PROXY_PROTOCOL` / `PROXY_HOST` / `PROXY_PORT` | 已在 compose 中设为 `http` / `clash-with-ui` / `7890`，一般无需改 |
+| `PROXY_URL_REGEX` | 可选，限定走代理的 URL 正则；仅国外示例：`(youtube\|twitter\|telegram\|github\.com)` |
+| `BILIBILI_COOKIE_<uid>` | Bilibili Cookie，见 [COOKIE.md](docs/install/COOKIE.md) |
+| `WEIBO_COOKIES` | 微博 Cookie |
+
+更多变量见 `lib/config.js` 或 [docs/install/README.md](docs/install/README.md)。
+
+---
+
+## 四、安全与资源
+
+- **网络**：仅 RSSHub 的 1200、subconverter 的 25501 映射到宿主机；Clash 的 7890/9090 不映射，仅容器内网访问。
+- **敏感信息**：Cookie、订阅链接等仅放在 `.env`，不提交到版本库。
+- **资源**：Redis 使用 `redis:alpine`；可选在 `docker-compose.stack.yml` 中为各服务设置 `deploy.resources.limits.memory`（例如 RSSHub 256–512MB、Redis 64–128MB），避免单容器占满宿主机。
+
+---
+
+## 五、故障排查
+
+- **端口冲突**：确保 1200、25501 未被占用（栈内 subconverter 宿主机端口为 25501）。
+- **容器名冲突**：栈内容器名为 `rss-stack-*`，与独立运行的 clash-aio 不冲突。
+- **RSSHub 无法访问外网**：确认 rss-stack-clash-with-ui 已启动且 `RAW_SUB_URL` 有效；查看日志：`docker compose -f docker-compose.stack.yml logs rss-stack-clash-with-ui` 或 `docker logs rss-stack-clash-with-ui`。
+- **RSSHub 未就绪**：`docker logs rss-stack-rsshub`。
+- **Cookie 失效**：见 [docs/install/COOKIE.md](docs/install/COOKIE.md) 重新获取并更新 `.env` 后重启 rsshub 容器。
+- **构建很慢或镜像过大**：确认 [.dockerignore](.dockerignore) 已排除 `clash-aio`、`.env*` 等，避免进入 rsshub 构建上下文。

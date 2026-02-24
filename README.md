@@ -64,6 +64,10 @@ Refer to [Deployment](https://docs.rsshub.app/en/install/)
 
 见 [部署](https://docs.rsshub.app/install/)
 
+### RSS + Clash 栈（本仓库）
+
+将 RSSHub 与 Clash、Redis、Subconverter 统一编排（国外走代理、国内直连，可选 Cookie）。clash-aio 以 **git submodule** 形式位于 `./clash-aio`。**构建与使用**见 [DEPLOYMENT-STACK.md](DEPLOYMENT-STACK.md)：克隆时 `--recurse-submodules` 或 `git submodule update --init`、`.env` 准备、可选 `./scripts/stack-pre-install.sh`、一键 `./scripts/stack-build-and-up.sh`、以及通过 URL 在阅读器中订阅 RSS。**从零验证**：删除 `.env` 后先执行 `./scripts/stack-pre-install.sh` 再执行 `./scripts/stack-build-and-up.sh` 可验证全流程（需在生成的 `.env` 中补填 `RAW_SUB_URL`）。
+
 ## Support RSSHub
 
 Refer to [Support RSSHub](https://docs.rsshub.app/en/support/)

@@ -6,8 +6,11 @@ WORKDIR /app
 
 # place ARG statement before RUN statement which need it to avoid cache miss
 ARG USE_CHINA_NPM_REGISTRY=0
+# 构建时代理，加速 npm/pnpm 拉包；宿主机代理可用 host.docker.internal:7890（Windows/Mac）
+ARG BUILD_PROXY
 RUN \
     set -ex && \
+    if [ -n "$BUILD_PROXY" ]; then export http_proxy="$BUILD_PROXY" https_proxy="$BUILD_PROXY" HTTP_PROXY="$BUILD_PROXY" HTTPS_PROXY="$BUILD_PROXY"; fi && \
     if [ "$USE_CHINA_NPM_REGISTRY" = 1 ]; then \
         echo 'use npm mirror' && \
         npm config set registry https://registry.npmmirror.com && \
@@ -52,8 +55,10 @@ WORKDIR /minifier
 COPY --from=dep-version-parser /ver/* /minifier/
 
 ARG USE_CHINA_NPM_REGISTRY=0
+ARG BUILD_PROXY
 RUN \
     set -ex && \
+    if [ -n "$BUILD_PROXY" ]; then export http_proxy="$BUILD_PROXY" https_proxy="$BUILD_PROXY" HTTP_PROXY="$BUILD_PROXY" HTTPS_PROXY="$BUILD_PROXY"; fi && \
     if [ "$USE_CHINA_NPM_REGISTRY" = 1 ]; then \
         npm config set registry https://registry.npmmirror.com && \
         yarn config set registry https://registry.npmmirror.com && \
@@ -89,10 +94,12 @@ COPY --from=dep-version-parser /ver/.puppeteer_version /app/.puppeteer_version
 ARG TARGETPLATFORM
 ARG USE_CHINA_NPM_REGISTRY=0
 ARG PUPPETEER_SKIP_DOWNLOAD=1
+ARG BUILD_PROXY
 # The official recommended way to use Puppeteer on x86(_64) is to use the bundled Chromium from Puppeteer:
 # https://pptr.dev/faq#q-why-doesnt-puppeteer-vxxx-work-with-chromium-vyyy
 RUN \
     set -ex ; \
+    if [ -n "$BUILD_PROXY" ]; then export http_proxy="$BUILD_PROXY" https_proxy="$BUILD_PROXY" HTTP_PROXY="$BUILD_PROXY" HTTPS_PROXY="$BUILD_PROXY"; fi && \
     if [ "$PUPPETEER_SKIP_DOWNLOAD" = 0 ] && [ "$TARGETPLATFORM" = 'linux/amd64' ]; then \
         if [ "$USE_CHINA_NPM_REGISTRY" = 1 ]; then \
             npm config set registry https://registry.npmmirror.com && \

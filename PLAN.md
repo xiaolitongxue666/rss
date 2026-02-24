@@ -1,6 +1,10 @@
 # RSSHub 容器化部署计划
 
-本文档基于 [项目分析-RSS与RSSHub.md](项目分析-RSS与RSSHub.md) 的结论，描述在 Linux VPS 上通过容器化构建「个人情报局」抓取层的部署计划：容器化 RSSHub、容器化代理、分流策略、Cookie 配置，以及安全与稳定性要求。
+**本计划已实施。** 当前部署以 [DEPLOYMENT-STACK.md](DEPLOYMENT-STACK.md) 与 `docker-compose.stack.yml` 为准，资源限制等见 DEPLOYMENT-STACK 第四节。
+
+---
+
+本文档描述在 Linux VPS 上通过容器化构建「个人情报局」抓取层的部署计划：容器化 RSSHub、容器化代理、分流策略、Cookie 配置，以及安全与稳定性要求。
 
 **约束**：VPS 内存有限，优先采用 **Docker + Alpine** 等轻量镜像，并对各服务做内存与可选性优化（见下文第 2 节与第 2.1 节）。
 
@@ -8,7 +12,7 @@
 
 ## 1. 计划依据：基于 RSSHub 的部署方案
 
-- **选型**：采用官方镜像 `diygod/rsshub:latest` 或自建 `rss` 项目对应的镜像（若自建则建议基于 `node:alpine` 多阶段构建以减小体积与内存占用；环境变量与 [项目分析-RSS与RSSHub.md](项目分析-RSS与RSSHub.md) 中「使用方法」一致）。
+- **选型**：采用官方镜像 `diygod/rsshub:latest` 或自建 `rss` 项目对应的镜像（若自建则建议基于 `node:alpine` 多阶段构建以减小体积与内存占用；环境变量与本仓库 `lib/config.js` 及 RSSHub 官方文档一致）。
 - **运行形态**：RSSHub 以容器运行，依赖项（Redis、代理、可选无头浏览器）同样容器化，通过 Docker Compose 编排；在内存紧张时无头浏览器设为可选。
 - **配置来源**：RSSHub 通过环境变量驱动（见分析文档中的 `lib/config.js` / `lib/config.ts`），计划中的 `docker-compose` 与 `.env` 需与之对齐。
 
@@ -54,7 +58,7 @@
 ## 4. Cookie 配置以访问国内站点
 
 - **目的**：解决国内站反爬、登录态或限流（如 B 站、微博、知乎等），提高抓取成功率与稳定性。
-- **方式**：通过环境变量向 RSSHub 注入 Cookie，与 [项目分析-RSS与RSSHub.md](项目分析-RSS与RSSHub.md) 中 `config.js`/`config.ts` 的约定一致：
+- **方式**：通过环境变量向 RSSHub 注入 Cookie，与本仓库 `lib/config.js` 及 RSSHub 官方文档的约定一致：
   - **Bilibili**：`BILIBILI_COOKIE_1`（或 `BILIBILI_COOKIE_6` 等）填入 `SESSDATA` 等所需字段；多账号可配置多个 `BILIBILI_COOKIE_*` 轮询。
   - **微博**：`WEIBO_COOKIES` 填入从移动端/网页端提取的 Cookie（如含 `SUB` 等）。
   - **其它站点**：按 RSSHub 文档为对应路由配置 `*_COOKIE*` 或 `*_COOKIES` 环境变量。
@@ -103,4 +107,4 @@
 - **身份伪装（Cookie）**：通过环境变量为 Bilibili、微博等国内站注入 Cookie，提升抓取成功率。
 - **输出**：RSSHub 输出标准 RSS/Atom/JSON，可与 Obsidian、Templater、Python 脚本等下游「情报处理」流程衔接。
 
-本计划不包含具体 `docker-compose.yml` 或 `.env.example` 的完整书写；实施时以 [项目分析-RSS与RSSHub.md](项目分析-RSS与RSSHub.md) 中的环境变量说明及 RSSHub 官方部署文档为准，并在本计划的**安全、稳定性与低内存（Docker + Alpine 优先）**约束下编写与运维。
+本计划不包含具体 `docker-compose.yml` 或 `.env.example` 的完整书写；实施时以本仓库 `lib/config.js`、`.env.stack.example` 及 RSSHub 官方部署文档为准，并在本计划的**安全、稳定性与低内存（Docker + Alpine 优先）**约束下编写与运维。

@@ -1,5 +1,7 @@
 .DS_Store
 .env
+.env.bak
+.env.stack
 .eslintcache
 .idea
 .log
