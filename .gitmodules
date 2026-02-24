@@ -1,0 +1,3 @@
+[submodule "clash-aio"]
+	path = clash-aio
+	url = git@github.com:xiaolitongxue666/clash-aio.git
