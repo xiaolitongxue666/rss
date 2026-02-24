@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<opml version="1.0">
+    <head>
+        <title>Leon subscriptions in feedly Cloud</title>
+    </head>
+    <body>
+        <outline text="Other" title="Other"/>
+        <outline text="Blog" title="Blog">
+            <outline type="rss" text="80186 CPU on Jamie Iles - Software + Hardware" title="80186 CPU on Jamie Iles - Software + Hardware" xmlUrl="https://www.jamieiles.com/80186/index.xml" htmlUrl="https://www.jamieiles.com/80186/"/>
+            <outline type="rss" text="Planet Arch Linux" title="Planet Arch Linux" xmlUrl="http://planet.archlinux.org/atom.xml" htmlUrl="https://archlinux.org/planet/"/>
+            <outline type="rss" text="玩家云风的微博" title="玩家云风的微博" xmlUrl="https://rss-iota-fawn.vercel.app/weibo/user/6572114006" htmlUrl="https://weibo.com/6572114006/"/>
+            <outline type="rss" text="thePacketGeek" title="thePacketGeek" xmlUrl="https://thepacketgeek.com/atom.xml" htmlUrl="https://thepacketgeek.com"/>
+            <outline type="rss" text="阮一峰的网络日志" title="阮一峰的网络日志" xmlUrl="http://feeds.feedburner.com/ruanyifeng" htmlUrl="http://www.ruanyifeng.com/blog/"/>
+            <outline type="rss" text="forecho's Blog" title="forecho's Blog" xmlUrl="http://blog.forecho.com/atom.xml" htmlUrl="https://blog.forecho.com/"/>
+            <outline type="rss" text="Steve Brunton's Lab" title="Steve Brunton's Lab" xmlUrl="https://www.eigensteve.com/blog-feed.xml" htmlUrl="https://www.eigensteve.com/blog"/>
+            <outline type="rss" text="Jason Fried" title="Jason Fried" xmlUrl="https://world.hey.com/jason/feed.atom" htmlUrl="https://world.hey.com/jason"/>
+            <outline type="rss" text="Loud Thinking by David Heinemeier Hansson" title="Loud Thinking by David Heinemeier Hansson" xmlUrl="http://feeds.feedburner.com/LoudThinking" htmlUrl="http://mongrel/"/>
+            <outline type="rss" text="卡瓦邦噶！" title="卡瓦邦噶！" xmlUrl="http://www.kawabangga.com/feed" htmlUrl="https://www.kawabangga.com"/>
+            <outline type="rss" text="BMPI" title="BMPI" xmlUrl="https://www.bmpi.dev/index.xml" htmlUrl="https://www.bmpi.dev/"/>
+            <outline type="rss" text="萌音大酋长的微博" title="萌音大酋长的微博" xmlUrl="https://rss-iota-fawn.vercel.app/weibo/user/7488137069" htmlUrl="https://weibo.com/7488137069/"/>
+            <outline type="rss" text="Pat Shaughnessy" title="Pat Shaughnessy" xmlUrl="http://feeds2.feedburner.com/patshaughnessy"/>
+            <outline type="rss" text="Joel on Software" title="Joel on Software" xmlUrl="https://www.joelonsoftware.com/feed/" htmlUrl="https://www.joelonsoftware.com"/>
+            <outline type="rss" text="别梦依稀笑逝川的微博" title="别梦依稀笑逝川的微博" xmlUrl="https://rss-iota-fawn.vercel.app/weibo/user/2198935377" htmlUrl="https://weibo.com/2198935377/"/>
+            <outline type="rss" text="-四分三十三秒-的微博" title="-四分三十三秒-的微博" xmlUrl="https://rss-iota-fawn.vercel.app/weibo/user/5307012945" htmlUrl="https://weibo.com/5307012945/"/>
+            <outline type="rss" text="Scott Brady - scottbrady.io" title="Scott Brady - scottbrady.io" xmlUrl="https://www.scottbrady91.com/rss.xml" htmlUrl="https://www.scottbrady.io"/>
+            <outline type="rss" text="Huahua’s Tech Road" title="Huahua’s Tech Road" xmlUrl="https://zxi.mytechroad.com/blog/feed/" htmlUrl="https://zxi.mytechroad.com/blog"/>
+            <outline type="rss" text="Wizard Zines" title="Wizard Zines" xmlUrl="https://wizardzines.com/index.xml" htmlUrl="https://wizardzines.com"/>
+            <outline type="rss" text="HowStuffWorks - Learn How Everything Works!" title="HowStuffWorks - Learn How Everything Works!" xmlUrl="https://syndication.howstuffworks.com/rss/HSW" htmlUrl="https://www.howstuffworks.com/"/>
+            <outline type="rss" text="写书哥的微博" title="写书哥的微博" xmlUrl="https://rss-iota-fawn.vercel.app/weibo/user/7235308961" htmlUrl="https://weibo.com/7235308961/"/>
+            <outline type="rss" text="Pascal's Scribbles" title="Pascal's Scribbles" xmlUrl="https://deterministic.space/feed.xml" htmlUrl="https://deterministic.space/"/>
+            <outline type="rss" text="Writing an OS in Rust" title="Writing an OS in Rust" xmlUrl="https://os.phil-opp.com/rss.xml" htmlUrl="https://os.phil-opp.com"/>
+            <outline type="rss" text="Armin Ronacher's Thoughts and Writings" title="Armin Ronacher's Thoughts and Writings" xmlUrl="http://lucumr.pocoo.org/feed.atom" htmlUrl="https://lucumr.pocoo.org/"/>
+            <outline type="rss" text="Orhun's Blog" title="Orhun's Blog" xmlUrl="https://blog.orhun.dev/rss.xml" htmlUrl="https://blog.orhun.dev"/>
+            <outline type="rss" text="Andy Stewart" title="Andy Stewart" xmlUrl="https://manateelazycat.github.io/feed.xml" htmlUrl="https://manateelazycat.github.io/"/>
+            <outline type="rss" text="Jay Carlson" title="Jay Carlson" xmlUrl="https://jaycarlson.net/feed/" htmlUrl="https://jaycarlson.net"/>
+            <outline type="rss" text="Martin Fowler" title="Martin Fowler" xmlUrl="http://martinfowler.com/bliki/bliki.atom" htmlUrl="https://martinfowler.com"/>
+            <outline type="rss" text="Architecture Notes" title="Architecture Notes" xmlUrl="https://architecturenotes.co/rss/" htmlUrl="https://architecturenotes.co/"/>
+            <outline type="rss" text="baby steps" title="baby steps" xmlUrl="http://smallcultfollowing.com/babysteps/atom.xml" htmlUrl="https://smallcultfollowing.com/babysteps/"/>
+            <outline type="rss" text="Web Dev Simplified Blog" title="Web Dev Simplified Blog" xmlUrl="https://blog.webdevsimplified.com/rss.xml" htmlUrl="https://blog.webdevsimplified.com/"/>
+            <outline type="rss" text="The Codist" title="The Codist" xmlUrl="http://feeds.feedburner.com/thecodist" htmlUrl="https://thecodist.com/"/>
+            <outline type="rss" text="HelloGithub - 热门项目" title="HelloGithub - 热门项目" xmlUrl="https://rss-iota-fawn.vercel.app/hellogithub" htmlUrl="https://hellogithub.com/?sort_by=hot"/>
+            <outline type="rss" text="xkcd" title="xkcd" xmlUrl="http://xkcd.com/rss.xml" htmlUrl="https://xkcd.com/"/>
+            <outline type="rss" text="NetworkChuck" title="NetworkChuck" xmlUrl="https://networkchuck.com/feed/" htmlUrl="https://networkchuck.com/"/>
+            <outline type="rss" text="酷 壳 – CoolShell" title="酷 壳 – CoolShell" xmlUrl="https://coolshell.cn/feed" htmlUrl="https://coolshell.cn"/>
+            <outline type="rss" text="泥腿叔的微博" title="泥腿叔的微博" xmlUrl="https://rss-iota-fawn.vercel.app/weibo/user/7397352335" htmlUrl="https://weibo.com/7397352335/"/>
+            <outline type="rss" text="单手搓核弹的微博" title="单手搓核弹的微博" xmlUrl="https://rss-iota-fawn.vercel.app/weibo/user/7711753752" htmlUrl="https://weibo.com/7711753752/"/>
+            <outline type="rss" text="云风的 BLOG" title="云风的 BLOG" xmlUrl="https://blog.codingnow.com/index.xml" htmlUrl="https://blog.codingnow.com/"/>
+            <outline type="rss" text="Techno Tim" title="Techno Tim" xmlUrl="https://docs.technotim.live/feed.xml" htmlUrl="https://technotim.com/"/>
+            <outline type="rss" text="三点水" title="三点水" xmlUrl="http://lotabout.me/atom.xml" htmlUrl="https://lotabout.me/"/>
+            <outline type="rss" text="TimDbg" title="TimDbg" xmlUrl="https://www.timdbg.com/index.xml" htmlUrl="https://www.timdbg.com/"/>
+            <outline type="rss" text="沈逸的微博" title="沈逸的微博" xmlUrl="https://rss-iota-fawn.vercel.app/weibo/user/1157864602" htmlUrl="https://weibo.com/1157864602/"/>
+            <outline type="rss" text="Leandro Moreira" title="Leandro Moreira" xmlUrl="https://leandromoreira.com/feed/" htmlUrl="https://leandromoreira.com"/>
+            <outline type="rss" text="Bret Victor's website" title="Bret Victor's website" xmlUrl="http://worrydream.com/feed.xml" htmlUrl="https://worrydream.com/"/>
+            <outline type="rss" text="Filippo Valsorda" title="Filippo Valsorda" xmlUrl="https://words.filippo.io/rss/" htmlUrl="https://words.filippo.io/"/>
+            <outline type="rss" text="Preshing on Programming" title="Preshing on Programming" xmlUrl="http://preshing.com/feed" htmlUrl="https://preshing.com/"/>
+            <outline type="rss" text="V闪闪的微博" title="V闪闪的微博" xmlUrl="https://rss-iota-fawn.vercel.app/weibo/user/1174692545" htmlUrl="https://weibo.com/1174692545/"/>
+            <outline type="rss" text="Phoronix" title="Phoronix" xmlUrl="https://www.phoronix.com/rss.php" htmlUrl="https://www.phoronix.com/"/>
+            <outline type="rss" text="Chris Titus Tech | Tech Content Creator" title="Chris Titus Tech | Tech Content Creator" xmlUrl="https://www.christitus.com/index.xml" htmlUrl="https://christitus.com/"/>
+        </outline>
+        <outline text="Video" title="Video">
+            <outline type="rss" text="Practical Engineering" title="Practical Engineering" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UCMOqf8ab-42UUQIdVoKwjlQ" htmlUrl="https://www.youtube.com/channel/UCMOqf8ab-42UUQIdVoKwjlQ"/>
+            <outline type="rss" text="Tinkernut" title="Tinkernut" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UCZDA1kA3y3EIg25BpcHSpwQ" htmlUrl="https://www.youtube.com/channel/UCZDA1kA3y3EIg25BpcHSpwQ"/>
+            <outline type="rss" text="Zoe.languages" title="Zoe.languages" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UCRAltBg8Fp5c1-RbAXzk4LQ" htmlUrl="https://www.youtube.com/channel/UCRAltBg8Fp5c1-RbAXzk4LQ"/>
+            <outline type="rss" text="Branch Education - Community - YouTube" title="Branch Education - Community - YouTube" xmlUrl="https://rss-iota-fawn.vercel.app/youtube/community/@BranchEducation" htmlUrl="https://www.youtube.com/channel/UCdp4_l1vPmpN-gDbUwhaRUQ"/>
+            <outline type="rss" text="Hitesh Choudhary" title="Hitesh Choudhary" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UCXgGY0wkgOzynnHvSEVmE3A" htmlUrl="https://www.youtube.com/channel/UCXgGY0wkgOzynnHvSEVmE3A"/>
+            <outline type="rss" text="爱上半导体" title="爱上半导体" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UC885Hx4pKcS7mAD62gLCqMg" htmlUrl="https://www.youtube.com/channel/UC885Hx4pKcS7mAD62gLCqMg"/>
+            <outline type="rss" text="Chris Titus Technical" title="Chris Titus Technical" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UCtYg149E_wUGVmjGz-TgyNA" htmlUrl="https://www.youtube.com/channel/UCtYg149E_wUGVmjGz-TgyNA"/>
+            <outline type="rss" text="Tek Syndicate" title="Tek Syndicate" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UCNovoA9w0KnxyDP5bGrOYzg" htmlUrl="https://www.youtube.com/channel/UCNovoA9w0KnxyDP5bGrOYzg"/>
+            <outline type="rss" text="Mike Shah" title="Mike Shah" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UCA64pZbN5Mz5NxC3SO4qpDg" htmlUrl="https://www.youtube.com/channel/UCA64pZbN5Mz5NxC3SO4qpDg"/>
+            <outline type="rss" text="Hardware Haven" title="Hardware Haven" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UCgdTVe88YVSrOZ9qKumhULQ" htmlUrl="https://www.youtube.com/channel/UCgdTVe88YVSrOZ9qKumhULQ"/>
+            <outline type="rss" text="真的很博通" title="真的很博通" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UCNiJNzSkfumLB7bYtXcIEmg" htmlUrl="https://www.youtube.com/channel/UCNiJNzSkfumLB7bYtXcIEmg"/>
+            <outline type="rss" text="Chris Titus Tech" title="Chris Titus Tech" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UCg6gPGh8HU2U01vaFCAsvmQ" htmlUrl="https://www.youtube.com/channel/UCg6gPGh8HU2U01vaFCAsvmQ"/>
+            <outline type="rss" text="-鸦-karas 的 bilibili 动态" title="-鸦-karas 的 bilibili 动态" xmlUrl="https://rss-iota-fawn.vercel.app/bilibili/user/dynamic/272195" htmlUrl="https://space.bilibili.com/272195/dynamic"/>
+            <outline type="rss" text="废材者联盟" title="废材者联盟" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UCJysubtoXgzgnbfATNJ3xDw" htmlUrl="https://www.youtube.com/channel/UCJysubtoXgzgnbfATNJ3xDw"/>
+            <outline type="rss" text="科技阿宅王 - Community - YouTube" title="科技阿宅王 - Community - YouTube" xmlUrl="https://rss-iota-fawn.vercel.app/youtube/community/@Tech_Otaku_King" htmlUrl="https://www.youtube.com/channel/UCePBBAoQG_j5oqP9mfIvcig"/>
+            <outline type="rss" text="Jacob Sorber" title="Jacob Sorber" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UCwd5VFu4KoJNjkWJZMFJGHQ" htmlUrl="https://www.youtube.com/channel/UCwd5VFu4KoJNjkWJZMFJGHQ"/>
+            <outline type="rss" text="十三兰德" title="十三兰德" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UCrAC8OPSig6ceB0ypzPzoOw" htmlUrl="https://www.youtube.com/channel/UCrAC8OPSig6ceB0ypzPzoOw"/>
+            <outline type="rss" text="徐云流浪中国 的 bilibili 动态" title="徐云流浪中国 的 bilibili 动态" xmlUrl="https://rss-iota-fawn.vercel.app/bilibili/user/dynamic/697166795" htmlUrl="https://space.bilibili.com/697166795/dynamic"/>
+            <outline type="rss" text="Traversy Media" title="Traversy Media" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UC29ju8bIPH5as8OGnQzwJyA" htmlUrl="https://www.youtube.com/channel/UC29ju8bIPH5as8OGnQzwJyA"/>
+            <outline type="rss" text="Tsoding Daily" title="Tsoding Daily" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UCrqM0Ym_NbK1fqeQG2VIohg" htmlUrl="https://www.youtube.com/channel/UCrqM0Ym_NbK1fqeQG2VIohg"/>
+            <outline type="rss" text="鸑鷟残飞坠 的 bilibili 动态" title="鸑鷟残飞坠 的 bilibili 动态" xmlUrl="https://rss-iota-fawn.vercel.app/bilibili/user/dynamic/38364550" htmlUrl="https://space.bilibili.com/38364550/dynamic"/>
+            <outline type="rss" text="TheCW 的 bilibili 动态" title="TheCW 的 bilibili 动态" xmlUrl="https://rss-iota-fawn.vercel.app/bilibili/user/dynamic/13081489" htmlUrl="https://space.bilibili.com/13081489/dynamic"/>
+            <outline type="rss" text="OneMarcFifty" title="OneMarcFifty" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UCG5Ph9Mm6UEQLJJ-kGIC2AQ" htmlUrl="https://www.youtube.com/channel/UCG5Ph9Mm6UEQLJJ-kGIC2AQ"/>
+            <outline type="rss" text="The PrimeTime" title="The PrimeTime" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UCUyeluBRhGPCW4rPe_UvBZQ" htmlUrl="https://www.youtube.com/channel/UCUyeluBRhGPCW4rPe_UvBZQ"/>
+            <outline type="rss" text="兽医杜立德 的 bilibili 动态" title="兽医杜立德 的 bilibili 动态" xmlUrl="https://rss-iota-fawn.vercel.app/bilibili/user/dynamic/9295953" htmlUrl="https://space.bilibili.com/9295953/dynamic"/>
+            <outline type="rss" text="Ali Abdaal" title="Ali Abdaal" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UCoOae5nYA7VqaXzerajD0lg" htmlUrl="https://www.youtube.com/channel/UCoOae5nYA7VqaXzerajD0lg"/>
+            <outline type="rss" text="不良林" title="不良林" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UCbCCUH8S3yhlm7__rhxR2QQ" htmlUrl="https://www.youtube.com/channel/UCbCCUH8S3yhlm7__rhxR2QQ"/>
+            <outline type="rss" text="怪兽电台MonsterBlog 的 bilibili 动态" title="怪兽电台MonsterBlog 的 bilibili 动态" xmlUrl="https://rss-iota-fawn.vercel.app/bilibili/user/dynamic/41149747" htmlUrl="https://space.bilibili.com/41149747/dynamic"/>
+            <outline type="rss" text="心河摆渡" title="心河摆渡" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UCy2aOVSWiF_ivcb0ilhGaXQ" htmlUrl="https://www.youtube.com/channel/UCy2aOVSWiF_ivcb0ilhGaXQ"/>
+            <outline type="rss" text="JalexRosaCh 的 bilibili 动态" title="JalexRosaCh 的 bilibili 动态" xmlUrl="https://rss-iota-fawn.vercel.app/bilibili/user/dynamic/1954231583" htmlUrl="https://space.bilibili.com/1954231583/dynamic"/>
+            <outline type="rss" text="TechHut" title="TechHut" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UCjSEJkpGbcZhvo0lr-44X_w" htmlUrl="https://www.youtube.com/channel/UCjSEJkpGbcZhvo0lr-44X_w"/>
+            <outline type="rss" text="Linking Your Thinking with Nick Milo" title="Linking Your Thinking with Nick Milo" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UC85D7ERwhke7wVqskV_DZUA" htmlUrl="https://www.youtube.com/channel/UC85D7ERwhke7wVqskV_DZUA"/>
+            <outline type="rss" text="NeuralNine" title="NeuralNine" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UC8wZnXYK_CGKlBcZp-GxYPA" htmlUrl="https://www.youtube.com/channel/UC8wZnXYK_CGKlBcZp-GxYPA"/>
+            <outline type="rss" text="Ambition" title="Ambition" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UC4X7J9D6VbTIwnFDFNkfQ1A" htmlUrl="https://www.youtube.com/channel/UC4X7J9D6VbTIwnFDFNkfQ1A"/>
+            <outline type="rss" text="Andrew Huberman" title="Andrew Huberman" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UC2D2CMWXMOVWx7giW1n3LIg" htmlUrl="https://www.youtube.com/channel/UC2D2CMWXMOVWx7giW1n3LIg"/>
+            <outline type="rss" text="Dev Stef" title="Dev Stef" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UC0Vs-iWmGokjioV1zq58zQQ" htmlUrl="https://www.youtube.com/channel/UC0Vs-iWmGokjioV1zq58zQQ"/>
+            <outline type="rss" text="Christian Lempa" title="Christian Lempa" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UCZNhwA1B5YqiY1nLzmM0ZRg" htmlUrl="https://www.youtube.com/channel/UCZNhwA1B5YqiY1nLzmM0ZRg"/>
+            <outline type="rss" text="AngeTheGreat" title="AngeTheGreat" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UCV0t1y4h_6-2SqEpXBXgwFQ" htmlUrl="https://www.youtube.com/channel/UCV0t1y4h_6-2SqEpXBXgwFQ"/>
+            <outline type="rss" text="Elijah Manor" title="Elijah Manor" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UCTCDjn7rnejAvhOrhlVgZrw" htmlUrl="https://www.youtube.com/channel/UCTCDjn7rnejAvhOrhlVgZrw"/>
+            <outline type="rss" text="ExplainingComputers" title="ExplainingComputers" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UCbiGcwDWZjz05njNPrJU7jA" htmlUrl="https://www.youtube.com/channel/UCbiGcwDWZjz05njNPrJU7jA"/>
+            <outline type="rss" text="黑貓的野望 的 bilibili 动态" title="黑貓的野望 的 bilibili 动态" xmlUrl="https://rss-iota-fawn.vercel.app/bilibili/user/dynamic/14202394" htmlUrl="https://space.bilibili.com/14202394/dynamic"/>
+            <outline type="rss" text="五个光" title="五个光" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UC5ZRTe-rCdZ5wlUivoJYYHQ" htmlUrl="https://www.youtube.com/channel/UC5ZRTe-rCdZ5wlUivoJYYHQ"/>
+        </outline>
+    </body>
+</opml>

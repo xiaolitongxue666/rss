@@ -6,6 +6,7 @@
 .idea
 .log
 .now
+.venv-opml
 .vercel
 .vscode
 .yarn
