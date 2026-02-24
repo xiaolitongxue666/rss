@@ -66,7 +66,17 @@ Refer to [Deployment](https://docs.rsshub.app/en/install/)
 
 ### RSS + Clash 栈（本仓库）
 
-将 RSSHub 与 Clash、Redis、Subconverter 统一编排（国外走代理、国内直连，可选 Cookie）。clash-aio 以 **git submodule** 形式位于 `./clash-aio`。**构建与使用**见 [DEPLOYMENT-STACK.md](DEPLOYMENT-STACK.md)：克隆时 `--recurse-submodules` 或 `git submodule update --init`、`.env` 准备、可选 `./scripts/stack-pre-install.sh`、一键 `./scripts/stack-build-and-up.sh`、以及通过 URL 在阅读器中订阅 RSS。**从零验证**：删除 `.env` 后先执行 `./scripts/stack-pre-install.sh` 再执行 `./scripts/stack-build-and-up.sh` 可验证全流程（需在生成的 `.env` 中补填 `RAW_SUB_URL`）。
+将 RSSHub 与 Clash、Redis、Subconverter 统一编排（国外走代理、国内直连，可选 Cookie）。clash-aio 以 **git submodule** 形式位于 `./clash-aio`。**构建与使用**见 [DEPLOYMENT-STACK.md](DEPLOYMENT-STACK.md)。
+
+| 脚本 | 说明 |
+|------|------|
+| `./scripts/stack-pre-install.sh` | 前置检查：创建/补全 `.env`、检测 clash-aio 路径 |
+| `./scripts/stack-build-and-up.sh` | 一键构建并启动栈（日常推荐） |
+| `./scripts/stack-from-zero.sh` | 从零构建 + 分步启动 + 整体验证（系统性测试） |
+| `./scripts/stack-stop-all.sh` | 停止所有相关容器（stack / 默认 compose / 独立 clash-aio） |
+| `./scripts/stack-verify.sh` | 仅做整体验证（1200、25501、可选 Clash） |
+
+克隆时 `--recurse-submodules` 或 `git submodule update --init`，复制 `.env.stack.example` 为 `.env` 并填写 `RAW_SUB_URL`，然后执行上述脚本之一即可。
 
 ## Support RSSHub
 

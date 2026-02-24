@@ -1,9 +1,11 @@
 # folders
+.cursor
 .devcontainer
 .github
 .husky
 .idea
 .vscode
+.venv-opml
 clash-aio
 Dockerfile*
 LICENSE
@@ -13,6 +15,7 @@ assets
 coverage
 docs
 node_modules
+opml
 test
 
 # files

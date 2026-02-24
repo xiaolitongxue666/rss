@@ -8,6 +8,16 @@
 2. 复制 `.env.stack.example` 为 `.env`，填写 **RAW_SUB_URL**（必填）及可选 CLASH_AIO_PATH、Cookie。
 3. 在 rss 项目根目录执行：`./scripts/stack-build-and-up.sh`。
 
+### 栈脚本索引（均在 rss 根目录执行）
+
+| 脚本 | 说明 |
+|------|------|
+| `stack-pre-install.sh` | 前置检查与 .env 准备（可由其他脚本自动调用） |
+| `stack-build-and-up.sh` | 一键构建并启动（日常使用） |
+| `stack-from-zero.sh` | 从零构建 + 分步启动 + 验证（系统性测试） |
+| `stack-stop-all.sh` | 停止所有相关容器 |
+| `stack-verify.sh` | 仅验证 1200 / 25501 / 可选 Clash |
+
 ---
 
 ## 结构示意
@@ -81,6 +91,27 @@ docker compose -f docker-compose.stack.yml build
 # 或
 docker-compose -f docker-compose.stack.yml build
 ```
+
+### 1.6 从零构建与系统性测试
+
+用于一次性验证「停止全部容器 → 前置检查 clash-aio → 先启动 Clash → 再启动 RSS → 整体验证」的完整链路。脚本需在 **rss 项目根目录** 执行（Git Bash 或 WSL）。
+
+- **停止所有相关容器**（stack、默认 docker-compose、独立 clash-aio compose）：
+  ```bash
+  ./scripts/stack-stop-all.sh
+  ```
+
+- **从零构建并分步启动 + 整体验证**（系统性测试入口，跑通即表示测试通过）：
+  ```bash
+  ./scripts/stack-from-zero.sh
+  ```
+  流程：调用 stack-stop-all.sh → stack-pre-install.sh → 构建 → 先 `up -d subconverter clash-with-ui` 并等待就绪 → 再 `up -d redis rsshub` 并等待 1200 → 调用 stack-verify.sh。
+
+- **仅做整体验证**（检查 RSSHub 1200、Subconverter 25501，可选 Clash 容器）：
+  ```bash
+  ./scripts/stack-verify.sh
+  ```
+  退出码 0 表示通过，非 0 表示未通过。
 
 ---
 
