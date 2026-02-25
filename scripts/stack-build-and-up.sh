@@ -61,7 +61,7 @@ docker compose -f docker-compose.stack.yml build 2>/dev/null || docker-compose -
 
 # ---------- 启动栈 ----------
 echo "启动容器..."
-docker compose -f docker-compose.stack.yml up -d 2>/dev/null || docker-compose -f docker-compose.stack.yml up -d
+docker compose -f docker-compose.stack.yml up -d 2>/dev/null || docker compose -f docker-compose.stack.yml up -d
 
 # ---------- 可选：等待 rsshub 就绪并验证 ----------
 echo "等待 rsshub 端口 1200 就绪..."

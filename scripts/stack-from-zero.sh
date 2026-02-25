@@ -58,7 +58,7 @@ fi
 # ---------- 3. 构建 ----------
 echo "========== 3. 构建栈镜像 =========="
 [ -n "${BUILD_PROXY}" ] && export BUILD_PROXY
-$COMPOSE_CMD -f docker-compose.stack.yml build 2>/dev/null || docker-compose -f docker-compose.stack.yml build
+$COMPOSE_CMD -f docker-compose.stack.yml build 2>/dev/null || docker compose -f docker-compose.stack.yml build
 
 # ---------- 4. 先启动 Clash 相关（subconverter + clash-with-ui） ----------
 echo "========== 4. 启动 Clash 相关服务 =========="
