@@ -11,8 +11,12 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 RSS_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 cd "$RSS_ROOT"
 
+# ---------- 检测 Docker Compose V2（仅支持 docker compose，不支持已废弃的 docker-compose） ----------
 COMPOSE_CMD="docker compose"
-command -v docker >/dev/null 2>&1 && docker compose version >/dev/null 2>&1 || COMPOSE_CMD="docker-compose"
+if ! command -v docker >/dev/null 2>&1 || ! docker compose version >/dev/null 2>&1; then
+  echo "错误：未检测到 Docker 或 Docker Compose V2（docker compose）。请安装 Docker 并启用 Compose 插件。"
+  exit 1
+fi
 
 is_valid_clash_dir() {
   [ -d "$1" ] && [ -f "$1/Dockerfile" ] && [ -f "$1/preprocess.sh" ]

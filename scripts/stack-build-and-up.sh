@@ -12,6 +12,13 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 RSS_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 cd "$RSS_ROOT"
 
+# ---------- 检测 Docker Compose V2（仅支持 docker compose，不支持已废弃的 docker-compose） ----------
+COMPOSE_CMD="docker compose"
+if ! command -v docker >/dev/null 2>&1 || ! docker compose version >/dev/null 2>&1; then
+  echo "错误：未检测到 Docker 或 Docker Compose V2（docker compose）。请安装 Docker 并启用 Compose 插件。"
+  exit 1
+fi
+
 # ---------- 构建前环境检查（可 SKIP_PRE_INSTALL=1 跳过） ----------
 "$SCRIPT_DIR/stack-pre-install.sh" || true
 
@@ -57,11 +64,11 @@ fi
 # ---------- 构建镜像 ----------
 echo "使用 CLASH_AIO_PATH=$CLASH_AIO_PATH"
 echo "构建栈镜像（subconverter 使用上游镜像，clash-with-ui、rsshub 本地构建）..."
-docker compose -f docker-compose.stack.yml build 2>/dev/null || docker-compose -f docker-compose.stack.yml build
+$COMPOSE_CMD -f docker-compose.stack.yml build
 
 # ---------- 启动栈 ----------
 echo "启动容器..."
-docker compose -f docker-compose.stack.yml up -d 2>/dev/null || docker compose -f docker-compose.stack.yml up -d
+$COMPOSE_CMD -f docker-compose.stack.yml up -d
 
 # ---------- 可选：等待 rsshub 就绪并验证 ----------
 echo "等待 rsshub 端口 1200 就绪..."
@@ -71,7 +78,7 @@ for i in $(seq 1 30); do
     break
   fi
   if [ "$i" -eq 30 ]; then
-    echo "超时未检测到 1200 端口，请检查: docker logs rss-stack-rsshub 或 docker compose -f docker-compose.stack.yml logs"
+    echo "超时未检测到 1200 端口，请检查: docker logs rss-stack-rsshub 或 $COMPOSE_CMD -f docker-compose.stack.yml logs"
     exit 1
   fi
   sleep 2

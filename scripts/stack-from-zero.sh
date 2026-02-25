@@ -11,8 +11,12 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 RSS_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 cd "$RSS_ROOT"
 
+# ---------- 检测 Docker Compose V2（仅支持 docker compose，不支持已废弃的 docker-compose） ----------
 COMPOSE_CMD="docker compose"
-command -v docker >/dev/null 2>&1 && docker compose version >/dev/null 2>&1 || COMPOSE_CMD="docker-compose"
+if ! command -v docker >/dev/null 2>&1 || ! docker compose version >/dev/null 2>&1; then
+  echo "错误：未检测到 Docker 或 Docker Compose V2（docker compose）。请安装 Docker 并启用 Compose 插件。"
+  exit 1
+fi
 
 # ---------- 1. 停止所有相关容器 ----------
 echo "========== 1. 停止所有相关容器 =========="
@@ -58,11 +62,11 @@ fi
 # ---------- 3. 构建 ----------
 echo "========== 3. 构建栈镜像 =========="
 [ -n "${BUILD_PROXY}" ] && export BUILD_PROXY
-$COMPOSE_CMD -f docker-compose.stack.yml build 2>/dev/null || docker compose -f docker-compose.stack.yml build
+$COMPOSE_CMD -f docker-compose.stack.yml build
 
 # ---------- 4. 先启动 Clash 相关（subconverter + clash-with-ui） ----------
 echo "========== 4. 启动 Clash 相关服务 =========="
-$COMPOSE_CMD -f docker-compose.stack.yml up -d subconverter clash-with-ui 2>/dev/null || docker-compose -f docker-compose.stack.yml up -d subconverter clash-with-ui
+$COMPOSE_CMD -f docker-compose.stack.yml up -d subconverter clash-with-ui
 
 echo "等待 Subconverter 25501 就绪..."
 for i in $(seq 1 30); do
@@ -92,7 +96,7 @@ done
 
 # ---------- 5. 再启动 RSS 相关（redis + rsshub） ----------
 echo "========== 5. 启动 RSS 相关服务 =========="
-$COMPOSE_CMD -f docker-compose.stack.yml up -d redis rsshub 2>/dev/null || docker-compose -f docker-compose.stack.yml up -d redis rsshub
+$COMPOSE_CMD -f docker-compose.stack.yml up -d redis rsshub
 
 echo "等待 RSSHub 1200 就绪..."
 for i in $(seq 1 30); do

@@ -8,6 +8,8 @@
 2. 复制 `.env.stack.example` 为 `.env`，填写 **RAW_SUB_URL**（必填）及可选 CLASH_AIO_PATH、Cookie。
 3. 在 rss 项目根目录执行：`./scripts/stack-build-and-up.sh`。
 
+**环境要求**：本栈脚本仅支持 **Docker Compose V2**（`docker compose` 插件），不支持已废弃的独立命令 `docker-compose`。请安装 Docker 并启用 Compose 插件。
+
 ### 栈脚本索引（均在 rss 根目录执行）
 
 | 脚本 | 说明 |
@@ -17,6 +19,8 @@
 | `stack-from-zero.sh` | 从零构建 + 分步启动 + 验证（系统性测试） |
 | `stack-stop-all.sh` | 停止所有相关容器 |
 | `stack-verify.sh` | 仅验证 1200 / 25501 / 可选 Clash |
+| `stack-images-pack.sh` | 本机拉取/构建栈镜像并打包为 tar（用于离线部署） |
+| `stack-images-load.sh` | 服务器从 tar 加载镜像（用于离线部署） |
 
 ---
 
@@ -73,14 +77,12 @@
 
 ### 1.4 仅启动（已构建过）
 
-若镜像已存在，只需启动：
+若镜像已存在，只需启动（需 Docker Compose V2）：
 
 ```bash
 # 若未在 .env 中设置，需先 export
 export CLASH_AIO_PATH=/path/to/clash-aio
 docker compose -f docker-compose.stack.yml up -d
-# 或
-docker-compose -f docker-compose.stack.yml up -d
 ```
 
 ### 1.5 仅重新构建
@@ -88,15 +90,13 @@ docker-compose -f docker-compose.stack.yml up -d
 ```bash
 export CLASH_AIO_PATH=/path/to/clash-aio   # 若需
 docker compose -f docker-compose.stack.yml build
-# 或
-docker-compose -f docker-compose.stack.yml build
 ```
 
 ### 1.6 从零构建与系统性测试
 
 用于一次性验证「停止全部容器 → 前置检查 clash-aio → 先启动 Clash → 再启动 RSS → 整体验证」的完整链路。脚本需在 **rss 项目根目录** 执行（Git Bash 或 WSL）。
 
-- **停止所有相关容器**（stack、默认 docker-compose、独立 clash-aio compose）：
+- **停止所有相关容器**（stack、默认 compose、独立 clash-aio compose）：
   ```bash
   ./scripts/stack-stop-all.sh
   ```
@@ -162,3 +162,54 @@ RSSHub **通过 URL 提供订阅**，无需在后台“添加订阅列表”。
 - **RSSHub 未就绪**：`docker logs rss-stack-rsshub`。
 - **Cookie 失效**：见 [docs/install/COOKIE.md](docs/install/COOKIE.md) 重新获取并更新 `.env` 后重启 rsshub 容器。
 - **构建很慢或镜像过大**：确认 [.dockerignore](.dockerignore) 已排除 `clash-aio`、`.env*` 等，避免进入 rsshub 构建上下文。
+
+---
+
+## 六、离线/无 Docker Hub 环境
+
+当目标服务器无法访问 Docker Hub 时，可在本机（可访问外网或代理）拉取/构建镜像并打包，上传到服务器后加载再启动。
+
+### 6.1 本机：打包镜像
+
+在 **rss 项目根目录** 执行（需已配置 `.env` 与 CLASH_AIO_PATH，可选 BUILD_PROXY 加速）：
+
+```bash
+./scripts/stack-images-pack.sh
+```
+
+脚本会：拉取 `tindy2013/subconverter:latest`、`redis:alpine` → 使用 `docker compose -f docker-compose.stack.yml build` 构建 clash-with-ui 与 rsshub → 将四个镜像 `docker save` 为单一 tar。输出路径由环境变量 `STACK_IMAGES_TAR` 指定，未设置时默认为项目根目录下的 `rss-stack-images.tar`（或上级目录，见脚本说明）。脚本结束时会打印生成的 tar 路径及建议的 scp 命令。
+
+### 6.2 上传到服务器
+
+将 tar 上传到服务器 **/tmp**，便于多用户访问。示例：
+
+```bash
+scp rss-stack-images.tar <用户>@<服务器>:/tmp/
+```
+
+上传后在服务器上设置权限（使其他用户可读）：
+
+```bash
+chmod 644 /tmp/rss-stack-images.tar
+```
+
+### 6.3 服务器：加载镜像并启动
+
+登录服务器并进入 rss 项目根目录后：
+
+1. **加载镜像**（默认从 `/tmp/rss-stack-images.tar` 读取，可通过环境变量 `STACK_IMAGES_TAR` 覆盖）：
+   ```bash
+   ./scripts/stack-images-load.sh
+   ```
+   或直接：`docker load -i /tmp/rss-stack-images.tar`
+
+2. **启动栈**：
+   ```bash
+   ./scripts/stack-build-and-up.sh
+   ```
+   此时镜像已存在，无需再从外网拉取。
+
+### 6.4 验证
+
+- **本机**：构建成功后用浏览器或 `curl` 访问服务器上的 RSSHub（如 `http://<服务器>:1200/`），确认可访问。
+- **服务器**：在服务器上执行 `curl ipinfo.io`，可确认出网地区（例如非中国大陆则代理/出网正常）。
