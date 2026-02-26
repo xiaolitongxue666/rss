@@ -17,10 +17,31 @@
 | `stack-pre-install.sh` | 前置检查与 .env 准备（可由其他脚本自动调用） |
 | `stack-build-and-up.sh` | 一键构建并启动（日常使用） |
 | `stack-from-zero.sh` | 从零构建 + 分步启动 + 验证（系统性测试） |
+| `stack-down.sh` | 一键退出服务并停止相关容器 |
 | `stack-stop-all.sh` | 停止所有相关容器 |
 | `stack-verify.sh` | 仅验证 1200 / 25501 / 可选 Clash |
 | `stack-images-pack.sh` | 本机拉取/构建栈镜像并打包为 tar（用于离线部署） |
 | `stack-images-load.sh` | 服务器从 tar 加载镜像（用于离线部署） |
+| `stack-server-check.sh` | 服务器本机检查 1200/25501、Clash 7890、本机出网 ipinfo |
+
+---
+
+## 零、服务器端前置（Docker 权限）
+
+在服务器上运行栈脚本的用户（如 `alchemy`）需能访问 Docker 守护进程，否则会报错：`permission denied while trying to connect to the Docker daemon socket`。
+
+**一次性配置**（用具备 sudo 的账号执行）：
+
+```bash
+sudo usermod -aG docker alchemy
+```
+
+**生效方式**（二选一）：
+
+- **推荐**：该用户完全退出登录后重新登录（再次 `sudo su - alchemy` 或 SSH 以该用户登录）。
+- **当前会话立即生效**：在该用户下执行 `newgrp docker`，再执行 `docker ps` 验证。
+
+**验证**：以该用户执行 `docker ps` 无 permission denied 即表示生效；`usermod -aG docker` 为持久配置，重启后仍有效。
 
 ---
 
@@ -96,10 +117,7 @@ docker compose -f docker-compose.stack.yml build
 
 用于一次性验证「停止全部容器 → 前置检查 clash-aio → 先启动 Clash → 再启动 RSS → 整体验证」的完整链路。脚本需在 **rss 项目根目录** 执行（Git Bash 或 WSL）。
 
-- **停止所有相关容器**（stack、默认 compose、独立 clash-aio compose）：
-  ```bash
-  ./scripts/stack-stop-all.sh
-  ```
+- **停止所有相关容器**（stack、默认 compose、独立 clash-aio compose）：执行 `./scripts/stack-down.sh`（一键退出）或 `./scripts/stack-stop-all.sh`。
 
 - **从零构建并分步启动 + 整体验证**（系统性测试入口，跑通即表示测试通过）：
   ```bash
@@ -165,6 +183,14 @@ RSSHub **通过 URL 提供订阅**，无需在后台“添加订阅列表”。
 
 ---
 
+## 五.1 公网访问与端口暴露
+
+栈内 RSSHub 已映射到宿主机 `0.0.0.0:1200`。若公网无法访问，常见原因：（1）云安全组/防火墙未放行 TCP 1200，需在控制台添加入站规则；（2）若仅通过 Nginx/OpenResty 暴露 80/443，需在反向代理中配置到 `proxy_pass http://127.0.0.1:1200`。
+
+**不暴露 1200 时的访问方式**：本机使用 SSH 本地端口转发后访问，例如 `ssh -L 1200:127.0.0.1:1200 用户@服务器`，再在浏览器打开 `http://127.0.0.1:1200`。
+
+---
+
 ## 六、离线/无 Docker Hub 环境
 
 当目标服务器无法访问 Docker Hub 时，可在本机（可访问外网或代理）拉取/构建镜像并打包，上传到服务器后加载再启动。
@@ -212,4 +238,4 @@ chmod 644 /tmp/rss-stack-images.tar
 ### 6.4 验证
 
 - **本机**：构建成功后用浏览器或 `curl` 访问服务器上的 RSSHub（如 `http://<服务器>:1200/`），确认可访问。
-- **服务器**：在服务器上执行 `curl ipinfo.io`，可确认出网地区（例如非中国大陆则代理/出网正常）。
+- **服务器**：在服务器上执行 `curl ipinfo.io` 可确认出网地区（例如非中国大陆则代理/出网正常）；或执行 `./scripts/stack-server-check.sh` 做本机端口与出网自检。
