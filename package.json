@@ -35,7 +35,8 @@
     "prepare": "node ./scripts/prepare.js",
     "profiling": "NODE_ENV=production node --prof lib/index.js",
     "start": "node lib/index.js",
-    "test": "npm run format:check && npm run jest:coverage"
+    "test": "npm run format:check && npm run jest:coverage",
+    "node:install": "node scripts/ensure-node.js"
   },
   "nodemonConfig": {
     "ext": "art,js,mjs,json",
