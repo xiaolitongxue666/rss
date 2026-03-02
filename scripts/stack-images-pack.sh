@@ -4,6 +4,7 @@
 # 依赖：Docker、Docker Compose V2（docker compose）、已配置 .env 与 CLASH_AIO_PATH
 # 用法：在 rss 项目根目录执行 ./scripts/stack-images-pack.sh
 # 输出：STACK_IMAGES_TAR 指定路径，未设置时默认为项目根目录/rss-stack-images.tar
+# 可选：SKIP_BUILD=1 时仅打包已有镜像（不拉取、不构建），本地已运行过栈时使用
 # ---------------------------------------------------------------------------
 
 set -e
@@ -19,16 +20,24 @@ if ! command -v docker >/dev/null 2>&1 || ! docker compose version >/dev/null 2>
   exit 1
 fi
 
-# ---------- 环境与 CLASH_AIO_PATH ----------
+# ---------- 确保子项目已初始化 ----------
+if [ -f .gitmodules ]; then
+  git submodule update --init --recursive || true
+fi
+
+# ---------- 环境与 CLASH_AIO_PATH、RSSHUB_PATH ----------
 "$SCRIPT_DIR/stack-pre-install.sh" || true
 CLASH_AIO_PATH="${CLASH_AIO_PATH:-./clash-aio}"
+RSSHUB_PATH="${RSSHUB_PATH:-./RSSHub}"
 if [ -f .env ]; then
   set -a
   # shellcheck source=/dev/null
   source .env 2>/dev/null || true
   set +a
   [ -n "${CLASH_AIO_PATH}" ] || CLASH_AIO_PATH="./clash-aio"
+  [ -n "${RSSHUB_PATH}" ] || RSSHUB_PATH="./RSSHub"
 fi
+export RSSHUB_PATH
 if [ ! -d "$CLASH_AIO_PATH" ]; then
   CLASH_AIO_PATH="$RSS_ROOT/$CLASH_AIO_PATH"
 fi
@@ -38,6 +47,8 @@ if [ ! -d "$CLASH_AIO_PATH" ] || [ ! -f "$CLASH_AIO_PATH/Dockerfile" ] || [ ! -f
 fi
 CLASH_AIO_PATH="$(cd "$CLASH_AIO_PATH" && pwd)"
 export CLASH_AIO_PATH
+[ ! -d "$RSSHUB_PATH" ] && RSSHUB_PATH="$RSS_ROOT/$RSSHUB_PATH"
+export RSSHUB_PATH
 [ -n "${BUILD_PROXY}" ] && export BUILD_PROXY
 
 # ---------- 输出路径 ----------
@@ -48,14 +59,16 @@ if [ ! -d "$OUTPUT_DIR" ]; then
   exit 1
 fi
 
-# ---------- 拉取上游镜像 ----------
-echo "拉取 tindy2013/subconverter:latest、redis:alpine..."
-docker pull tindy2013/subconverter:latest
-docker pull redis:alpine
-
-# ---------- 构建栈镜像 ----------
-echo "构建 clash-with-ui、rsshub 镜像..."
-$COMPOSE_CMD -f docker-compose.stack.yml build
+# ---------- 拉取/构建（SKIP_BUILD=1 时跳过，仅用本地已有镜像打包） ----------
+if [ "${SKIP_BUILD}" != "1" ]; then
+  echo "拉取 tindy2013/subconverter:latest、redis:alpine..."
+  docker pull tindy2013/subconverter:latest
+  docker pull redis:alpine
+  echo "构建 clash-with-ui、rsshub 镜像..."
+  $COMPOSE_CMD -f docker-compose.stack.yml build
+else
+  echo "SKIP_BUILD=1：跳过拉取与构建，使用本地已有镜像打包。"
+fi
 
 # ---------- 打包为单一 tar ----------
 echo "打包四个镜像到 $OUTPUT_TAR ..."
@@ -66,8 +79,7 @@ docker save \
   rsshub:stack \
   -o "$OUTPUT_TAR"
 
-echo "已生成: $OUTPUT_TAR"
-echo "建议上传到服务器 /tmp 并设置权限后加载，例如："
-echo "  scp $OUTPUT_TAR <用户>@<服务器>:/tmp/"
-echo "  # 在服务器上: chmod 644 /tmp/rss-stack-images.tar"
-echo "  # 在服务器 rss 根目录: ./scripts/stack-images-load.sh && ./scripts/stack-build-and-up.sh"
+echo "已生成: $OUTPUT_TAR（已加入 .gitignore）"
+echo "本地已有镜像时下次可: SKIP_BUILD=1 ./scripts/stack-images-pack.sh"
+echo "一键上传到服务器并 load: ./scripts/stack-upload-to-server.sh"
+echo "或手动: scp 到服务器后，在 rss 根目录执行 ./scripts/stack-images-load.sh && ./scripts/stack-build-and-up.sh"

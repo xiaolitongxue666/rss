@@ -22,15 +22,23 @@ fi
 # ---------- 构建前环境检查（可 SKIP_PRE_INSTALL=1 跳过） ----------
 "$SCRIPT_DIR/stack-pre-install.sh" || true
 
-# ---------- 加载 .env 并确定 CLASH_AIO_PATH、BUILD_PROXY ----------
+# ---------- 确保子项目已初始化 ----------
+if [ -f .gitmodules ]; then
+  git submodule update --init --recursive || true
+fi
+
+# ---------- 加载 .env 并确定 CLASH_AIO_PATH、RSSHUB_PATH、BUILD_PROXY ----------
 CLASH_AIO_PATH="${CLASH_AIO_PATH:-./clash-aio}"
+RSSHUB_PATH="${RSSHUB_PATH:-./RSSHub}"
 if [ -f .env ]; then
   set -a
   # shellcheck source=/dev/null
   source .env 2>/dev/null || true
   set +a
   [ -n "${CLASH_AIO_PATH}" ] || CLASH_AIO_PATH="./clash-aio"
+  [ -n "${RSSHUB_PATH}" ] || RSSHUB_PATH="./RSSHub"
 fi
+export RSSHUB_PATH
 # 构建时代理：.env 中设置 BUILD_PROXY=http://host.docker.internal:7890 可加速拉包（需本机已起代理）；Linux 可用 BUILD_PROXY=http://<本机IP>:7890
 [ -n "${BUILD_PROXY}" ] && export BUILD_PROXY
 # 转为绝对路径便于 compose 使用
@@ -62,8 +70,10 @@ if [ -f .env ] && ! grep -q '^RAW_SUB_URL=.\+' .env 2>/dev/null; then
 fi
 
 # ---------- 构建镜像 ----------
-echo "使用 CLASH_AIO_PATH=$CLASH_AIO_PATH"
-echo "构建栈镜像（subconverter 使用上游镜像，clash-with-ui、rsshub 本地构建）..."
+[ ! -d "$RSSHUB_PATH" ] && RSSHUB_PATH="$RSS_ROOT/$RSSHUB_PATH"
+export RSSHUB_PATH
+echo "使用 CLASH_AIO_PATH=$CLASH_AIO_PATH RSSHUB_PATH=$RSSHUB_PATH"
+echo "构建栈镜像（subconverter 使用上游镜像，clash-with-ui、rsshub 从子项目构建）..."
 $COMPOSE_CMD -f docker-compose.stack.yml build
 
 # ---------- 启动栈 ----------

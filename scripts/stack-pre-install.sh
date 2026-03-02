@@ -71,7 +71,26 @@ fi
 # ---------- 若仍无有效 clash-aio，检查是否为未初始化的 submodule ----------
 if ! is_valid_clash_dir "$RSS_ROOT/clash-aio"; then
   if [ -f .gitmodules ] && grep -q 'clash-aio' .gitmodules 2>/dev/null; then
-    echo "提示：clash-aio 为 git submodule，请先执行: git submodule update --init clash-aio"
+    echo "提示：clash-aio 为 git submodule，请先执行: git submodule update --init --recursive"
+    exit 1
+  fi
+fi
+
+# ---------- 检查 RSSHub 子项目（默认 ./RSSHub） ----------
+RSSHUB_PATH="${RSSHUB_PATH:-./RSSHub}"
+if [ -f .env ]; then
+  env_rsshub=$(grep -E '^RSSHUB_PATH=' .env 2>/dev/null | cut -d= -f2- | sed 's/^[" ]*//;s/[" ]*$//' || true)
+  [ -n "$env_rsshub" ] && RSSHUB_PATH="$env_rsshub"
+fi
+if [ ! -d "$RSSHUB_PATH" ]; then
+  [ -d "$RSS_ROOT/$RSSHUB_PATH" ] && RSSHUB_PATH="$RSS_ROOT/$RSSHUB_PATH"
+fi
+if [ ! -d "$RSSHUB_PATH" ] || [ ! -f "$RSSHUB_PATH/Dockerfile" ]; then
+  if [ -f .gitmodules ] && grep -q 'RSSHub' .gitmodules 2>/dev/null; then
+    echo "错误：RSSHub 子项目未初始化或缺少 Dockerfile，请先执行: git submodule update --init --recursive"
+    exit 1
+  else
+    echo "错误：RSSHUB_PATH 指向的目录不存在或缺少 Dockerfile: $RSSHUB_PATH"
     exit 1
   fi
 fi

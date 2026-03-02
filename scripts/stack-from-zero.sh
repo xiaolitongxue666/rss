@@ -22,18 +22,21 @@ fi
 echo "========== 1. 停止所有相关容器 =========="
 "$SCRIPT_DIR/stack-stop-all.sh"
 
-# ---------- 2. 前置检查（clash-aio 是否存在等） ----------
-echo "========== 2. 前置检查 clash-aio =========="
+# ---------- 2. 前置检查（子项目与 .env） ----------
+echo "========== 2. 前置检查 =========="
+git submodule update --init --recursive || true
 "$SCRIPT_DIR/stack-pre-install.sh" || true
 
-# ---------- 加载 .env 并校验 CLASH_AIO_PATH ----------
+# ---------- 加载 .env 并校验 CLASH_AIO_PATH、RSSHUB_PATH ----------
 CLASH_AIO_PATH="${CLASH_AIO_PATH:-./clash-aio}"
+RSSHUB_PATH="${RSSHUB_PATH:-./RSSHub}"
 if [ -f .env ]; then
   set -a
   # shellcheck source=/dev/null
   source .env 2>/dev/null || true
   set +a
   [ -n "${CLASH_AIO_PATH}" ] || CLASH_AIO_PATH="./clash-aio"
+  [ -n "${RSSHUB_PATH}" ] || RSSHUB_PATH="./RSSHub"
 fi
 if [ ! -d "$CLASH_AIO_PATH" ]; then
   CLASH_AIO_PATH="$RSS_ROOT/$CLASH_AIO_PATH"
@@ -44,9 +47,15 @@ if [ ! -d "$CLASH_AIO_PATH" ]; then
 fi
 CLASH_AIO_PATH="$(cd "$CLASH_AIO_PATH" && pwd)"
 export CLASH_AIO_PATH
+[ ! -d "$RSSHUB_PATH" ] && RSSHUB_PATH="$RSS_ROOT/$RSSHUB_PATH"
+export RSSHUB_PATH
 
 if [ ! -f "$CLASH_AIO_PATH/Dockerfile" ] || [ ! -f "$CLASH_AIO_PATH/preprocess.sh" ]; then
   echo "错误：$CLASH_AIO_PATH 中缺少 Dockerfile 或 preprocess.sh"
+  exit 1
+fi
+if [ ! -f "$RSSHUB_PATH/Dockerfile" ]; then
+  echo "错误：RSSHUB_PATH 中缺少 Dockerfile: $RSSHUB_PATH"
   exit 1
 fi
 
