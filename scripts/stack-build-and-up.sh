@@ -69,12 +69,16 @@ if [ -f .env ] && ! grep -q '^RAW_SUB_URL=.\+' .env 2>/dev/null; then
   esac
 fi
 
-# ---------- 构建镜像 ----------
+# ---------- 构建镜像（SKIP_BUILD=1 时跳过，仅用已加载的镜像启动）----------
 [ ! -d "$RSSHUB_PATH" ] && RSSHUB_PATH="$RSS_ROOT/$RSSHUB_PATH"
 export RSSHUB_PATH
 echo "使用 CLASH_AIO_PATH=$CLASH_AIO_PATH RSSHUB_PATH=$RSSHUB_PATH"
-echo "构建栈镜像（subconverter 使用上游镜像，clash-with-ui、rsshub 从子项目构建）..."
-$COMPOSE_CMD -f docker-compose.stack.yml build
+if [ "${SKIP_BUILD}" = "1" ]; then
+  echo "SKIP_BUILD=1，跳过构建，使用已有镜像启动。"
+else
+  echo "构建栈镜像（subconverter 使用上游镜像，clash-with-ui、rsshub 从子项目构建）..."
+  $COMPOSE_CMD -f docker-compose.stack.yml build
+fi
 
 # ---------- 启动栈 ----------
 echo "启动容器..."
