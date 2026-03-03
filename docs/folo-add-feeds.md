@@ -40,17 +40,20 @@
 | 类型     | 订阅地址示例 |
 |----------|--------------|
 | 热搜     | `https://ai.moicen.com/rss/bilibili/hot-search` |
-| UP 主投稿 | `https://ai.moicen.com/rss/bilibili/user/video/<uid>`（uid 从 UP 主页 URL 获取） |
+| UP 主投稿 | `https://ai.moicen.com/rss/bilibili/user/video/<uid>`（uid 从 UP 主页 URL 获取；易遇 412 风控，见下） |
+| 用户关注视频动态 | `https://ai.moicen.com/rss/bilibili/followings/video/<你的uid>`（需 Cookie，推荐：先关注 UP，只订此一条可减少风控） |
 | 综合热门 | `https://ai.moicen.com/rss/bilibili/popular/all` |
 | 每周必看 | `https://ai.moicen.com/rss/bilibili/weekly` |
 
-更多（分区、专栏等）见 [RSSHub Bilibili 路由](https://rsshub.netlify.app/zh/routes/social-media#bilibili)。
+更多（分区、专栏等）见 [RSSHub Bilibili 路由](https://rsshub.netlify.app/zh/routes/social-media#bilibili)。若 UP 投稿或关注视频路由常返回 412/503，见 [bilibili-cookie-docker.md](bilibili-cookie-docker.md) 第六节与 [troubleshooting.md](troubleshooting.md)。
 
 **需要 Cookie 的路由**（如 UP 主动态、关注动态、粉丝、收藏夹、稍后再看等）：
 
-- 在服务器 `.env` 中配置：`BILIBILI_COOKIE_<uid>=<登录后复制的整段 Cookie>`，其中 `<uid>` 为 B 站用户 uid（与路由中的 uid 一致），例如 `BILIBILI_COOKIE_2267573=xxx`。
-- 获取方式：登录 bilibili.com → 打开 `https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/dynamic_new?uid=0&type=8` → 开发者工具 Network → 找到 `dynamic_new` 请求 → 复制 Cookie。视频/专栏/粉丝等仅需 SESSDATA；动态建议复制整段 Cookie。
-- 修改 `.env` 后重启 rsshub 容器生效。
+- **推荐**：将 Cookie 保存到项目 `cookie/` 目录（如 `cookie/bilibili_cookies.py` 或 `cookie/bilibili.txt`），在 rss 项目根目录执行：
+  - 本地：`./scripts/apply-bilibili-cookie.sh --uid <uid>`（会合并到 `.env` 并重启 rsshub）
+  - 远程服务器：`./scripts/apply-bilibili-cookie.sh --uid <uid> --remote`（通过 scp/ssh 合并到服务器 `.env` 并重启 rsshub，需配置 `REMOTE_USER`、`REMOTE_HOST`、`REMOTE_ALCHEMY_DIR`）
+- 或手动：在运行 RSSHub 的机器上编辑 `.env`，添加 `BILIBILI_COOKIE_<uid>=<整段 Cookie>`，然后执行 `docker compose -f docker-compose.stack.yml up -d rsshub`。
+- **获取 Cookie**：登录 bilibili.com → 开发者工具 Network → 任选 api.bilibili.com 请求 → 复制请求头 Cookie。**详细步骤与防封建议**见 [docs/bilibili-cookie-docker.md](bilibili-cookie-docker.md)。
 
 ---
 
@@ -93,7 +96,7 @@
   - 微博：`WEIBO_COOKIES=整段 Cookie`
   - 其他站点：变量名一般为 `*_COOKIE*` 或 `*_COOKIES`，参考 [RSSHub 配置文档](https://docs.rsshub.app/zh/config/) 或本仓库 [.env.stack.example](../.env.stack.example)。
 - **生效**：修改 `.env` 后执行 `docker compose -f docker-compose.stack.yml up -d rsshub`（或本栈使用的启动命令）重启 rsshub 容器。
-- **安全**：勿将 `.env` 提交到版本库；生产环境勿在日志或公网暴露 Cookie。
+- **安全**：勿将 `.env` 提交到版本库；生产环境勿在日志或公网暴露 Cookie。B 站 Cookie 的详细获取与防封说明见 [docs/bilibili-cookie-docker.md](bilibili-cookie-docker.md)。
 
 ---
 

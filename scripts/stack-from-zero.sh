@@ -68,6 +68,13 @@ if [ -f .env ] && ! grep -q '^RAW_SUB_URL=.\+' .env 2>/dev/null; then
   esac
 fi
 
+# Cookie 配置提示：若存在 cookie 源且 .env 尚无 B 站 Cookie，提示运行 apply-bilibili-cookie.sh
+if [ -f "cookie/bilibili_cookies.py" ] || [ -f "cookie/bilibili.txt" ]; then
+  if ! grep -q '^BILIBILI_COOKIE_[0-9]*=.\+' .env 2>/dev/null; then
+    echo "提示：如需 B 站订阅（关注/动态等），请执行 ./scripts/apply-bilibili-cookie.sh 配置 Cookie 后重启 rsshub。"
+  fi
+fi
+
 # ---------- 3. 构建 ----------
 echo "========== 3. 构建栈镜像 =========="
 [ -n "${BUILD_PROXY}" ] && export BUILD_PROXY

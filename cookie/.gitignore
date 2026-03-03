@@ -1,0 +1,5 @@
+# 避免提交真实 Cookie
+*.txt
+*.cookies
+*.json
+*_cookies.py

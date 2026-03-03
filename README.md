@@ -8,7 +8,7 @@
 ## 快速开始
 
 1. 克隆并初始化子项目：`git clone --recurse-submodules <rss-repo-url>`，或克隆后执行 `git submodule update --init --recursive`。
-2. 复制 `.env.stack.example` 为 `.env`，填写 **RAW_SUB_URL**（必填）及可选 Cookie。
+2. 复制 `.env.stack.example` 为 `.env`，填写 **RAW_SUB_URL**（必填）；可选 Cookie 可存于 `cookie/` 目录后执行 `./scripts/apply-bilibili-cookie.sh --uid <uid>`，见 [docs/bilibili-cookie-docker.md](docs/bilibili-cookie-docker.md)。
 3. 在项目根目录执行：`./scripts/stack-build-and-up.sh`。
 
 **环境要求**：Docker 与 Docker Compose V2（`docker compose`）。
@@ -16,6 +16,9 @@
 ## 文档
 
 - **部署与使用**：[DEPLOYMENT-STACK.md](DEPLOYMENT-STACK.md) — 构建、启动、环境变量、离线/备选构建流程。
+- **部署计划（操作顺序）**：[docs/deployment-plan.md](docs/deployment-plan.md) — 本地与远程部署步骤、Cookie 配置时机。
+- **B 站 Cookie 配置**：[docs/bilibili-cookie-docker.md](docs/bilibili-cookie-docker.md) — 获取 Cookie、`cookie/` 目录与 `apply-bilibili-cookie.sh`（本地/远程）。
+- **B 站 412/503 故障排查**：[docs/troubleshooting.md](docs/troubleshooting.md) — 风控、Cookie 与 uid 对应、PROXY_URL_REGEX、followings/video 推荐。
 - **在 FOLO（或其它 RSS 阅读器）中添加订阅源**：[docs/folo-add-feeds.md](docs/folo-add-feeds.md)。
 - **RSSHub 路由与参数**：[docs.rsshub.app](https://docs.rsshub.app/guide/)。
 
@@ -32,6 +35,8 @@
 | `stack-upload-to-server.sh` | 本机打包并上传 tar 到服务器、在服务器上 load（可配置 REMOTE_*） |
 | `stack-images-load.sh` | 服务器从 tar 加载镜像 |
 | `stack-server-update-and-start.sh` | 服务器更新后一键：检查权限 → 加载镜像 → 停旧容器 → 启动 |
+| `apply-bilibili-cookie.sh` | 从 `cookie/` 生成 BILIBILI_COOKIE_<uid> 并合并到 .env（`--local` / `--remote`） |
+| `cookie-build-and-deploy-remote.sh` | 一键从 cookie/ 构建并部署到远程（等价于 apply-bilibili-cookie.sh … --remote） |
 
 ## 更新子项目
 
