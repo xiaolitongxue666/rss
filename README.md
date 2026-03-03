@@ -16,6 +16,7 @@
 ## 文档
 
 - **部署与使用**：[DEPLOYMENT-STACK.md](DEPLOYMENT-STACK.md) — 构建、启动、环境变量、离线/备选构建流程。
+- **在 FOLO（或其它 RSS 阅读器）中添加订阅源**：[docs/folo-add-feeds.md](docs/folo-add-feeds.md)。
 - **RSSHub 路由与参数**：[docs.rsshub.app](https://docs.rsshub.app/guide/)。
 
 ## 栈脚本（均在 rss 根目录执行）

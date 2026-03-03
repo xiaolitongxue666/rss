@@ -148,7 +148,7 @@ RSSHub **通过 URL 提供订阅**，无需在后台“添加订阅列表”。
 3. **路由路径从哪查**：[RSSHub 官方文档](https://docs.rsshub.app)（按站点与类型查路径与示例）。
 4. **需要登录的路由**（如 B 站关注、微博时间线）：在 `.env` 中配置对应 Cookie 后重启 rsshub 容器，再在阅读器中添加上述格式的 URL 即可。
 
-更多参数（过滤、全文等）见 [docs.rsshub.app/parameter](https://docs.rsshub.app/parameter)。
+在 FOLO 或其它 RSS 阅读器中添加订阅源的详细步骤（含国内/国外示例与 Cookie 配置）见 [docs/folo-add-feeds.md](docs/folo-add-feeds.md)。更多参数（过滤、全文等）见 [docs.rsshub.app/parameter](https://docs.rsshub.app/parameter)。
 
 ---
 
