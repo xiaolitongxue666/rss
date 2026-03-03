@@ -24,6 +24,10 @@ tmp
 
 Session.vim
 combined.log
+
+# 栈镜像打包产物（本地构建后生成，不提交）
+rss-stack-images.tar
+rss-stack-images.tar.size
 dump.rdb
 error.log
 npm-debug.log

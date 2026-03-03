@@ -1,6 +1,6 @@
-# RSS + Clash 统一栈：RSSHub（自建镜像）+ Redis + Clash（clash-aio 构建）+ Subconverter
-# 使用前：复制 .env.stack.example 为 .env，填写 CLASH_AIO_PATH、RAW_SUB_URL 及可选 Cookie
-# 构建：默认 CLASH_AIO_PATH=./clash-aio（submodule）；可改为 .env 中任意路径
+# RSS + Clash 统一栈：RSSHub（子项目构建）+ Redis + Clash（clash-aio 子项目构建）+ Subconverter
+# 使用前：复制 .env.stack.example 为 .env，填写 RAW_SUB_URL 及可选 Cookie
+# 构建：RSSHUB_PATH=./RSSHub、CLASH_AIO_PATH=./clash-aio（均为 submodule）
 
 services:
   subconverter:
@@ -47,7 +47,7 @@ services:
 
   rsshub:
     build:
-      context: .
+      context: ${RSSHUB_PATH:-./RSSHub}
       dockerfile: Dockerfile
       args:
         # 构建时代理，加速拉包；宿主机代理可用 BUILD_PROXY=http://host.docker.internal:7890

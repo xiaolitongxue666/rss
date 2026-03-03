@@ -1,11 +1,11 @@
 # RSS + Clash 栈部署说明
 
-本栈将 RSSHub（本仓库自建镜像）、Redis、Clash（由 clash-aio 项目构建）与 Subconverter 统一编排：RSSHub 通过内网使用 Clash 代理访问外网，国内源直连；Cookie 等通过环境变量配置。
+本仓库为**主题项目**，负责 RSSHub + Clash + Redis + Subconverter 的统一编排与构建。RSSHub 与 clash-aio 以 **git submodule** 形式引入，核心代码不在此仓库修改；RSSHub 通过内网使用 Clash 代理访问外网，国内源直连；Cookie 等通过环境变量配置。
 
 ### 快速开始
 
-1. 克隆并初始化 submodule：`git clone --recurse-submodules <rss-repo-url>`，或克隆后执行 `git submodule update --init clash-aio`。
-2. 复制 `.env.stack.example` 为 `.env`，填写 **RAW_SUB_URL**（必填）及可选 CLASH_AIO_PATH、Cookie。
+1. 克隆并初始化子项目：`git clone --recurse-submodules <rss-repo-url>`，或克隆后执行 `git submodule update --init --recursive`（会初始化 RSSHub 与 clash-aio）。
+2. 复制 `.env.stack.example` 为 `.env`，填写 **RAW_SUB_URL**（必填）及可选 RSSHUB_PATH、CLASH_AIO_PATH、Cookie。
 3. 在 rss 项目根目录执行：`./scripts/stack-build-and-up.sh`。
 
 **环境要求**：本栈脚本仅支持 **Docker Compose V2**（`docker compose` 插件），不支持已废弃的独立命令 `docker-compose`。请安装 Docker 并启用 Compose 插件。
@@ -20,9 +20,13 @@
 | `stack-down.sh` | 一键退出服务并停止相关容器 |
 | `stack-stop-all.sh` | 停止所有相关容器 |
 | `stack-verify.sh` | 仅验证 1200 / 25501 / 可选 Clash |
-| `stack-images-pack.sh` | 本机拉取/构建栈镜像并打包为 tar（用于离线部署） |
+| `stack-images-pack.sh` | 本机拉取/构建栈镜像并打包为 tar（输出到项目内 `rss-stack-images.tar`，已 .gitignore）；本地已有镜像时可用 `SKIP_BUILD=1` 仅打包不构建 |
+| `stack-upload-to-server.sh` | 本机打包并上传 tar 到服务器、在服务器上 docker load（可设 REMOTE_USER/REMOTE_HOST/REMOTE_ALCHEMY_DIR；SKIP_PACK=1 仅上传已有 tar） |
 | `stack-images-load.sh` | 服务器从 tar 加载镜像（用于离线部署） |
+| `stack-server-update-and-start.sh` | 服务器端更新后一键流程：检查 Docker 权限 → 加载镜像 tar（若存在）→ 停止旧容器 → 启动栈 |
 | `stack-server-check.sh` | 服务器本机检查 1200/25501、Clash 7890、本机出网 ipinfo |
+
+**服务器更新后**：拉代码后可直接执行 `./scripts/stack-server-update-and-start.sh`（内含：Docker 权限检查 → 加载镜像 → 停止旧容器 → 启动）；或按顺序执行：加载镜像 → `stack-down.sh` → `stack-build-and-up.sh`。
 
 ---
 
@@ -69,22 +73,24 @@ sudo usermod -aG docker alchemy
 
 ## 一、构建说明
 
-### 1.1 克隆与 clash-aio（submodule）
+### 1.1 克隆与子项目（RSSHub、clash-aio）
 
-本仓库将 **clash-aio 作为 git submodule** 放在 `./clash-aio`，默认即用该路径，无需再配 CLASH_AIO_PATH。
+本仓库将 **RSSHub** 与 **clash-aio** 作为 git submodule，默认路径分别为 `./RSSHub`、`./clash-aio`。
 
-- **首次克隆**：`git clone --recurse-submodules <rss-repo-url>`，或克隆后执行 `git submodule update --init clash-aio`。
-- **若使用本机其他位置的 clash-aio**：在 `.env` 中设置 `CLASH_AIO_PATH=../clash-aio` 或 `../../Proxy/clash-aio` 等任意有效路径即可。
+- **首次克隆**：`git clone --recurse-submodules <rss-repo-url>`，或克隆后执行 `git submodule update --init --recursive`。
+- **更新子项目**：在 rss 根目录执行 `git submodule update --remote RSSHub` 或 `git submodule update --remote clash-aio`；若 RSSHub 使用自己的 fork，可进入 `RSSHub` 后 `git pull upstream master` 再回到 rss 提交新 submodule commit。
+- **若使用本机其他路径**：在 `.env` 中设置 `RSSHUB_PATH=../RSSHub`、`CLASH_AIO_PATH=../clash-aio` 等。
 
 ### 1.2 环境准备（.env）
 
 - 复制 `.env.stack.example` 为 `.env`，填写：
   - **RAW_SUB_URL**：Clash 订阅链接（必填）。
-  - **CLASH_AIO_PATH**：默认 `./clash-aio`（submodule）；若 clash-aio 在别处，改为对应相对或绝对路径。
+  - **RSSHUB_PATH**：默认 `./RSSHub`（submodule）。
+  - **CLASH_AIO_PATH**：默认 `./clash-aio`（submodule）。
   - 可选 **BUILD_PROXY**：构建时代理，如 `http://host.docker.internal:7890`。
-  - 可选 **BILIBILI_COOKIE_<uid>**、**WEIBO_COOKIES** 等，见 [docs/install/COOKIE.md](docs/install/COOKIE.md)。
+  - 可选 **BILIBILI_COOKIE_<uid>**、**WEIBO_COOKIES** 等，见 [RSSHub 官方文档](https://docs.rsshub.app/guide/)。
 
-**预检查脚本**：执行 `./scripts/stack-pre-install.sh` 可自动创建 `.env`（若缺失）、在常见位置检测 clash-aio 并写入 CLASH_AIO_PATH；`stack-build-and-up.sh` 会先调用该脚本（可通过 `SKIP_PRE_INSTALL=1` 跳过）。
+**预检查脚本**：执行 `./scripts/stack-pre-install.sh` 可自动创建 `.env`（若缺失）、检测子项目路径；`stack-build-and-up.sh` 会先调用该脚本（可通过 `SKIP_PRE_INSTALL=1` 跳过）。
 
 ### 1.3 一键构建并启动
 
@@ -94,7 +100,7 @@ sudo usermod -aG docker alchemy
 ./scripts/stack-build-and-up.sh
 ```
 
-脚本会：执行 pre-install 检查 → 加载 `.env` 并校验 CLASH_AIO_PATH → 构建 clash-with-ui 与 rsshub 镜像 → 启动四个容器 → 等待 RSSHub 端口 1200 就绪。
+脚本会：执行 pre-install 检查 → 初始化子项目（若未初始化）→ 加载 `.env` 并校验路径 → 从子项目构建 clash-with-ui 与 rsshub 镜像 → 启动四个容器 → 等待 RSSHub 端口 1200 就绪。
 
 ### 1.4 仅启动（已构建过）
 
@@ -102,14 +108,14 @@ sudo usermod -aG docker alchemy
 
 ```bash
 # 若未在 .env 中设置，需先 export
-export CLASH_AIO_PATH=/path/to/clash-aio
+export RSSHUB_PATH=./RSSHub CLASH_AIO_PATH=./clash-aio
 docker compose -f docker-compose.stack.yml up -d
 ```
 
 ### 1.5 仅重新构建
 
 ```bash
-export CLASH_AIO_PATH=/path/to/clash-aio   # 若需
+export RSSHUB_PATH=./RSSHub CLASH_AIO_PATH=./clash-aio   # 若需
 docker compose -f docker-compose.stack.yml build
 ```
 
@@ -139,12 +145,10 @@ RSSHub **通过 URL 提供订阅**，无需在后台“添加订阅列表”。
 
 1. **基地址**：本栈 RSSHub 地址为 **`http://127.0.0.1:1200`**（或你映射的域名/端口）。
 2. **订阅方式**：在任意 RSS 阅读器（Feedly、Inoreader、Fluent Reader 等）中「添加订阅」，填入 **`http://127.0.0.1:1200/<路由路径>`** 即可。
-3. **路由路径从哪查**：
-   - 官方路由文档：[docs.rsshub.app](https://docs.rsshub.app)（按站点与类型查路径与示例）。
-   - 示例：B 站用户投稿路径为 `/bilibili/user/video/:uid`，则订阅地址为 `http://127.0.0.1:1200/bilibili/user/video/2267573`；知乎热榜为 `http://127.0.0.1:1200/zhihu/hotlist`。
+3. **路由路径从哪查**：[RSSHub 官方文档](https://docs.rsshub.app)（按站点与类型查路径与示例）。
 4. **需要登录的路由**（如 B 站关注、微博时间线）：在 `.env` 中配置对应 Cookie 后重启 rsshub 容器，再在阅读器中添加上述格式的 URL 即可。
 
-更多参数（过滤、全文等）见 [docs/parameter](https://docs.rsshub.app/parameter) 或本仓库 `docs/parameter.md`。
+更多参数（过滤、全文等）见 [docs.rsshub.app/parameter](https://docs.rsshub.app/parameter)。
 
 ---
 
@@ -152,15 +156,16 @@ RSSHub **通过 URL 提供订阅**，无需在后台“添加订阅列表”。
 
 | 变量 | 说明 |
 |------|------|
-| `CLASH_AIO_PATH` | clash-aio 目录路径，用于构建与 subconverter 卷挂载 |
+| `RSSHUB_PATH` | RSSHub 子项目目录路径，默认 `./RSSHub` |
+| `CLASH_AIO_PATH` | clash-aio 子项目目录路径，默认 `./clash-aio` |
 | `RAW_SUB_URL` | Clash 订阅地址（clash-with-ui 启动时拉取） |
 | `BUILD_PROXY` | 可选，构建时代理，如 `http://host.docker.internal:7890` |
 | `PROXY_PROTOCOL` / `PROXY_HOST` / `PROXY_PORT` | 已在 compose 中设为 `http` / `clash-with-ui` / `7890`，一般无需改 |
 | `PROXY_URL_REGEX` | 可选，限定走代理的 URL 正则；仅国外示例：`(youtube\|twitter\|telegram\|github\.com)` |
-| `BILIBILI_COOKIE_<uid>` | Bilibili Cookie，见 [COOKIE.md](docs/install/COOKIE.md) |
+| `BILIBILI_COOKIE_<uid>` | Bilibili Cookie，见 [RSSHub 官方文档](https://docs.rsshub.app/guide/) |
 | `WEIBO_COOKIES` | 微博 Cookie |
 
-更多变量见 `lib/config.js` 或 [docs/install/README.md](docs/install/README.md)。
+更多变量见 [RSSHub 文档](https://docs.rsshub.app/guide/)。
 
 ---
 
@@ -178,8 +183,8 @@ RSSHub **通过 URL 提供订阅**，无需在后台“添加订阅列表”。
 - **容器名冲突**：栈内容器名为 `rss-stack-*`，与独立运行的 clash-aio 不冲突。
 - **RSSHub 无法访问外网**：确认 rss-stack-clash-with-ui 已启动且 `RAW_SUB_URL` 有效；查看日志：`docker compose -f docker-compose.stack.yml logs rss-stack-clash-with-ui` 或 `docker logs rss-stack-clash-with-ui`。
 - **RSSHub 未就绪**：`docker logs rss-stack-rsshub`。
-- **Cookie 失效**：见 [docs/install/COOKIE.md](docs/install/COOKIE.md) 重新获取并更新 `.env` 后重启 rsshub 容器。
-- **构建很慢或镜像过大**：确认 [.dockerignore](.dockerignore) 已排除 `clash-aio`、`.env*` 等，避免进入 rsshub 构建上下文。
+- **Cookie 失效**：参考 [RSSHub 官方文档](https://docs.rsshub.app/guide/) 重新获取并更新 `.env` 后重启 rsshub 容器。
+- **构建很慢或镜像过大**：rsshub 镜像从子项目 `RSSHub` 构建，构建上下文在子项目内；可选设置 `BUILD_PROXY` 加速拉包。
 
 ---
 
@@ -191,51 +196,74 @@ RSSHub **通过 URL 提供订阅**，无需在后台“添加订阅列表”。
 
 ---
 
-## 六、离线/无 Docker Hub 环境
+## 六、离线/无 Docker Hub 环境与构建失败时的备选流程
 
-当目标服务器无法访问 Docker Hub 时，可在本机（可访问外网或代理）拉取/构建镜像并打包，上传到服务器后加载再启动。
+当目标服务器无法访问 Docker Hub，或 CI/远程构建失败时，可在**本机**完成构建、打包、上传，在服务器上加载后启动。
 
-### 6.1 本机：打包镜像
+### 6.1 本机：打包镜像（推荐）
 
-在 **rss 项目根目录** 执行（需已配置 `.env` 与 CLASH_AIO_PATH，可选 BUILD_PROXY 加速）：
+在 **rss 项目根目录** 执行（需已配置 `.env` 与子项目 RSSHUB_PATH、CLASH_AIO_PATH，可选 BUILD_PROXY 加速）：
 
 ```bash
 ./scripts/stack-images-pack.sh
 ```
 
-脚本会：拉取 `tindy2013/subconverter:latest`、`redis:alpine` → 使用 `docker compose -f docker-compose.stack.yml build` 构建 clash-with-ui 与 rsshub → 将四个镜像 `docker save` 为单一 tar。输出路径由环境变量 `STACK_IMAGES_TAR` 指定，未设置时默认为项目根目录下的 `rss-stack-images.tar`（或上级目录，见脚本说明）。脚本结束时会打印生成的 tar 路径及建议的 scp 命令。
+脚本会：拉取 subconverter、redis → 构建 clash-with-ui 与 rsshub → 将四个镜像 `docker save` 为单一 tar。**若本地已运行过栈、镜像已存在**，可设 `SKIP_BUILD=1` 仅打包不拉取不构建。输出默认为项目根目录下的 `rss-stack-images.tar`（可通过 `STACK_IMAGES_TAR` 覆盖），已加入 `.gitignore`。
 
 ### 6.2 上传到服务器
 
-将 tar 上传到服务器 **/tmp**，便于多用户访问。示例：
+**一键打包并上传**（推荐）：在 rss 根目录执行：
+
+```bash
+./scripts/stack-upload-to-server.sh
+```
+
+脚本会依次：调用 `stack-images-pack.sh`（输出到项目内 `rss-stack-images.tar`）→ scp 到 `REMOTE_USER@REMOTE_HOST` 家目录 → ssh 执行 mv 到 `REMOTE_ALCHEMY_DIR` 并以 alchemy 用户 `docker load`。默认 `REMOTE_USER=leonli`、`REMOTE_HOST=moicen.com`、`REMOTE_ALCHEMY_DIR=/home/alchemy/RSS`，可通过环境变量覆盖。若 tar 已存在只需重新上传，可设 `SKIP_PACK=1`。
+
+**仅上传已有 tar**（手动）：将项目内的 `rss-stack-images.tar` 上传到服务器，例如：
 
 ```bash
 scp rss-stack-images.tar <用户>@<服务器>:/tmp/
-```
-
-上传后在服务器上设置权限（使其他用户可读）：
-
-```bash
-chmod 644 /tmp/rss-stack-images.tar
+# 或传到 alchemy 目录后 load，见 6.3
 ```
 
 ### 6.3 服务器：加载镜像并启动
 
-登录服务器并进入 rss 项目根目录后：
+登录服务器并进入 rss 项目根目录后，按顺序执行：
 
-1. **加载镜像**（默认从 `/tmp/rss-stack-images.tar` 读取，可通过环境变量 `STACK_IMAGES_TAR` 覆盖）：
+1. **Docker 权限**：确认当前用户（如 alchemy）有权限访问 Docker（`docker ps` 无 permission denied）。若无，需管理员执行 `sudo usermod -aG docker <用户>` 后该用户重新登录。
+
+2. **加载镜像**（将上传的 tar 解压引入 Docker，必须在启动前完成）：  
+   默认从 `/tmp/rss-stack-images.tar` 读取；若 tar 在 alchemy 目录（如本地上传脚本所放位置）：
    ```bash
+   export STACK_IMAGES_TAR=/home/alchemy/RSS/rss-stack-images.tar
    ./scripts/stack-images-load.sh
    ```
-   或直接：`docker load -i /tmp/rss-stack-images.tar`
+   或使用默认路径：`./scripts/stack-images-load.sh`（即 `docker load -i /tmp/rss-stack-images.tar`）。
 
-2. **启动栈**：
+3. **停止旧容器**：若服务器上已有老版本栈在运行，需先停止再启动新服务，避免端口或容器名冲突：
+   ```bash
+   ./scripts/stack-down.sh
+   ```
+   或停止所有相关容器：`./scripts/stack-stop-all.sh`
+
+4. **启动栈**：
    ```bash
    ./scripts/stack-build-and-up.sh
    ```
-   此时镜像已存在，无需再从外网拉取。
+   此时镜像已通过步骤 2 引入，无需再从外网拉取或构建。
+
+**一键执行**：若希望将步骤 2～4 合并，可在拉代码后执行：
+```bash
+./scripts/stack-server-update-and-start.sh
+```
+脚本会依次：检查 Docker 权限 → 在常见路径查找 tar 并加载（可选 `STACK_IMAGES_TAR`）→ 停止旧容器 → 启动栈。
 
 ### 6.4 验证
 
 - **本机**：构建成功后用浏览器或 `curl` 访问服务器上的 RSSHub（如 `http://<服务器>:1200/`），确认可访问。
 - **服务器**：在服务器上执行 `curl ipinfo.io` 可确认出网地区（例如非中国大陆则代理/出网正常）；或执行 `./scripts/stack-server-check.sh` 做本机端口与出网自检。
+
+### 6.5 仅拉取基础镜像（可选）
+
+若只需预置**上游基础镜像**（如 subconverter、redis、node 等）而不构建 rsshub/clash-with-ui，可参考与 rss 仓库同级的脚本（例如 `pull-save-upload-images.sh`）：拉取指定镜像 → `docker save` → scp 到服务器 → 在服务器上 `docker load`。完整栈仍建议使用 6.1 的 `stack-images-pack.sh`。
