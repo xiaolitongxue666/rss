@@ -31,7 +31,7 @@
 1. **获取 Cookie**：无痕窗口登录 bilibili.com，F12 → Application → Cookies → 复制为 `cookie/bilibili.txt` 或 `cookie/bilibili_cookies.py`（格式见 [bilibili-cookie-docker.md](bilibili-cookie-docker.md)）。
 2. **确认本人 uid**：变量名应为 `BILIBILI_COOKIE_<你的B站账号uid>`（不是 UP 主的 uid）。若你的账号 uid 是 1282360，则配置 `BILIBILI_COOKIE_1282360`。
 3. **部署到服务器**：在 rss 项目根目录执行  
-   `./scripts/cookie-build-and-deploy-remote.sh --uid 1282360`  
+   `./scripts/apply-bilibili-cookie.sh --uid 1282360 --remote`  
    会从 `cookie/` 生成配置、scp 到 moicen、合并到服务器 `.env` 并重启 rsshub。
 4. **订阅与 uid 对应**：  
    - 使用 **用户关注视频动态** 时，URL 中的 uid 必须与上面配置的 uid 一致，例如只配了 `BILIBILI_COOKIE_1282360` 时，只能访问 `.../followings/video/1282360`，不能访问 `.../followings/video/501`。
@@ -62,7 +62,7 @@
 ### 3.6 followings/video 仍不可用时的排查
 
 - **确认服务器 .env 中确有该 uid 的 Cookie**：例如访问 `.../followings/video/1282360` 时，服务器上必须有 `BILIBILI_COOKIE_1282360=...`（部署后可在服务器执行 `grep BILIBILI_COOKIE_1282360 .env` 确认）。
-- **Cookie 过期或已被限流**：B 站可能短时间内就限流或令 Cookie 失效；建议**重新获取 Cookie**（无痕 + 手机扫码），更新 `cookie/` 后再次执行 `./scripts/cookie-build-and-deploy-remote.sh --uid <你的uid>`。
+- **Cookie 过期或已被限流**：B 站可能短时间内就限流或令 Cookie 失效；建议**重新获取 Cookie**（无痕 + 手机扫码），更新 `cookie/` 后再次执行 `./scripts/apply-bilibili-cookie.sh --uid <你的uid> --remote`。
 - **尝试 filter 参数**：在订阅 URL 后加 `?filterout=author`，并确保 `.env` 中已设置 `RSSHUB_PLUGIN_FILTER=true`（[#20406 用户反馈](https://github.com/DIYgod/RSSHub/issues/20406) 部分场景下可恢复可用）。
 - **避免频繁刷新**：阅读器刷新间隔建议 ≥ 15～30 分钟；服务器端已设 `CACHE_EXPIRE=600` 时，同一路由 10 分钟内不会重复请求 B 站。
 - **Puppeteer**：社区反馈仅开 Puppeteer、不配 Cookie 仍易被限制，推荐以配置 Cookie 为主（[#20406](https://github.com/DIYgod/RSSHub/issues/20406)）。
@@ -85,7 +85,7 @@
 
 | 脚本/文档 | 说明 |
 |-----------|------|
-| [scripts/cookie-build-and-deploy-remote.sh](../scripts/cookie-build-and-deploy-remote.sh) | 一键：从 `cookie/` 构建 Cookie 配置 → scp 上传 moicen → 合并 .env → 重启 rsshub。 |
+| [scripts/apply-bilibili-cookie.sh](../scripts/apply-bilibili-cookie.sh) | 从 cookie/ 生成 BILIBILI_COOKIE_<uid> 并合并到 .env；加 `--remote` 即上传到服务器并重启 rsshub。 |
 | [scripts/apply-bilibili-cookie.sh](../scripts/apply-bilibili-cookie.sh) | 从 cookie 目录生成 `BILIBILI_COOKIE_<uid>` 并合并到 .env；支持 `--local`/`--remote`、`--no-restart`。 |
 | [docs/bilibili-cookie-docker.md](bilibili-cookie-docker.md) | Cookie 获取、格式、多账号、一键部署及 412 风控建议。 |
 | [docs/folo-add-feeds.md](folo-add-feeds.md) | FOLO 中添加订阅源，含 B 站 followings/video 与 UP 投稿说明。 |
@@ -95,7 +95,7 @@
 ## 六、快速检查清单
 
 - [ ] 已在 `cookie/` 下放置 `bilibili_cookies.py` 或 `bilibili.txt`，且 Cookie **完整**（含 SESSDATA、DedeUserID、bili_jct）；建议无痕 + 手机扫码重新获取。
-- [ ] 执行过 `./scripts/cookie-build-and-deploy-remote.sh --uid <你的uid>`，且 **URL 中的 uid 与配置的 BILIBILI_COOKIE_<uid> 一致**（如 1282360 则仅能访问 followings/video/1282360）。
+- [ ] 执行过 `./scripts/apply-bilibili-cookie.sh --uid <你的uid> --remote`，且 **URL 中的 uid 与配置的 BILIBILI_COOKIE_<uid> 一致**（如 1282360 则仅能访问 followings/video/1282360）。
 - [ ] 服务器 `.env` 中已设置 `PROXY_URL_REGEX`（仅国外站走代理）；已设 `CACHE_EXPIRE=600`、`RSSHUB_PLUGIN_FILTER=true`。
 - [ ] 仍不可用时：重新取 Cookie 再部署一次；订阅 URL 后加 `?filterout=author`；必要时设 `BILIBILI_EXCLUDE_SUBTITLES=true` 并重启 rsshub。
 

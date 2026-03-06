@@ -36,7 +36,7 @@
 | `stack-images-load.sh` | 服务器从 tar 加载镜像 |
 | `stack-server-update-and-start.sh` | 服务器更新后一键：检查权限 → 加载镜像 → 停旧容器 → 启动 |
 | `apply-bilibili-cookie.sh` | 从 `cookie/` 生成 BILIBILI_COOKIE_<uid> 并合并到 .env（`--local` / `--remote`） |
-| `cookie-build-and-deploy-remote.sh` | 一键从 cookie/ 构建并部署到远程（等价于 apply-bilibili-cookie.sh … --remote） |
+| `apply-weibo-cookie.sh` | 从 `cookie/` 生成 WEIBO_COOKIES 并合并到 .env（`--local` / `--remote`） |
 
 ## 更新子项目
 

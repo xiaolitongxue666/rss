@@ -28,10 +28,10 @@
 | `stack-server-update-and-start.sh` | 服务器端更新后一键流程：检查 Docker 权限 → 加载镜像 tar（若存在）→ 停止旧容器 → 启动栈 |
 | `stack-server-check.sh` | 服务器本机检查 1200/25501、Clash 7890、本机出网 ipinfo |
 | `apply-bilibili-cookie.sh` | 从 `cookie/` 目录生成 `BILIBILI_COOKIE_<uid>` 并合并到 .env；支持 `--local`（默认）/`--remote`、`--no-restart`；详见 [docs/bilibili-cookie-docker.md](docs/bilibili-cookie-docker.md) |
-| `cookie-build-and-deploy-remote.sh` | 一键从 cookie/ 构建并部署到远程（等价于 apply-bilibili-cookie.sh … --remote）；412/503 排查见 [docs/troubleshooting.md](docs/troubleshooting.md) |
-| `cookie-to-env.py` | 被 apply-bilibili-cookie.sh 调用，从 cookie/bilibili_cookies.py 或 cookie/bilibili.txt 生成 .env 行；亦可单独执行输出 Cookie 字符串 |
+| `apply-weibo-cookie.sh` | 从 `cookie/` 目录生成 `WEIBO_COOKIES` 并合并到 .env；支持 `--local`（默认）/`--remote`、`--no-restart` |
+| `cookie-to-env.py` | 被 apply-bilibili-cookie.sh / apply-weibo-cookie.sh 调用，从 cookie/ 生成 .env 行（`--site bilibili|weibo`）；亦可单独执行输出 Cookie 字符串 |
 
-**服务器更新后**：拉代码后可直接执行 `./scripts/stack-server-update-and-start.sh`（内含：Docker 权限检查 → 加载镜像 → 停止旧容器 → 启动）；或按顺序执行：加载镜像 → `stack-down.sh` → `stack-build-and-up.sh`。**Cookie**：若需 B 站等登录态路由，可在本机执行 `./scripts/cookie-build-and-deploy-remote.sh --uid <uid>` 或 `./scripts/apply-bilibili-cookie.sh --uid <uid> --remote` 将 Cookie 合并到服务器 .env 并重启 rsshub，或登录服务器后按 [docs/bilibili-cookie-docker.md](docs/bilibili-cookie-docker.md) 手动配置。
+**服务器更新后**：拉代码后可直接执行 `./scripts/stack-server-update-and-start.sh`（内含：Docker 权限检查 → 加载镜像 → 停止旧容器 → 启动）；或按顺序执行：加载镜像 → `stack-down.sh` → `stack-build-and-up.sh`。**Cookie**：若需 B 站等登录态路由，在本机执行 `./scripts/apply-bilibili-cookie.sh --uid <uid> --remote` 将 Cookie 合并到服务器 .env 并重启 rsshub；微博执行 `./scripts/apply-weibo-cookie.sh --remote`。或登录服务器后按 [docs/bilibili-cookie-docker.md](docs/bilibili-cookie-docker.md) 手动配置。
 
 ---
 
@@ -246,7 +246,7 @@ scp rss-stack-images.tar <用户>@<服务器>:/tmp/
    ```
    或使用默认路径：`./scripts/stack-images-load.sh`（即 `docker load -i /tmp/rss-stack-images.tar`）。
 
-3. **（可选）Cookie 配置**：若需 B 站关注/动态等路由，可在**本机**执行 `./scripts/cookie-build-and-deploy-remote.sh --uid <uid>` 或 `./scripts/apply-bilibili-cookie.sh --uid <uid> --remote`（需 `cookie/bilibili_cookies.py` 或 `cookie/bilibili.txt`），将 Cookie 合并到服务器 `.env` 并重启 rsshub；或登录服务器后编辑 `.env` 添加 `BILIBILI_COOKIE_<uid>=...` 再执行 `docker compose -f docker-compose.stack.yml up -d rsshub`。详见 [docs/bilibili-cookie-docker.md](docs/bilibili-cookie-docker.md)。
+3. **（可选）Cookie 配置**：若需 B 站关注/动态等路由，在本机执行 `./scripts/apply-bilibili-cookie.sh --uid <uid> --remote`（需 `cookie/bilibili_cookies.py` 或 `cookie/bilibili.txt`），将 Cookie 合并到服务器 `.env` 并重启 rsshub；微博执行 `./scripts/apply-weibo-cookie.sh --remote`。或登录服务器后编辑 `.env` 添加 `BILIBILI_COOKIE_<uid>=...` / `WEIBO_COOKIES=...` 再执行 `docker compose -f docker-compose.stack.yml up -d rsshub`。详见 [docs/bilibili-cookie-docker.md](docs/bilibili-cookie-docker.md)。
 
 4. **停止旧容器**：若服务器上已有老版本栈在运行，需先停止再启动新服务，避免端口或容器名冲突：
    ```bash
