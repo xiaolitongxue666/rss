@@ -42,10 +42,13 @@
 | 热搜     | `https://ai.moicen.com/rss/bilibili/hot-search` |
 | UP 主投稿 | `https://ai.moicen.com/rss/bilibili/user/video/<uid>`（uid 从 UP 主页 URL 获取；易遇 412 风控，见下） |
 | 用户关注视频动态 | `https://ai.moicen.com/rss/bilibili/followings/video/<你的uid>`（需 Cookie，推荐：先关注 UP，只订此一条可减少风控） |
+| 用户关注动态 | `https://ai.moicen.com/rss/bilibili/followings/dynamic/<你的uid>`（需 Cookie；含图文/转发/视频等） |
 | 综合热门 | `https://ai.moicen.com/rss/bilibili/popular/all` |
 | 每周必看 | `https://ai.moicen.com/rss/bilibili/weekly` |
 
 更多（分区、专栏等）见 [RSSHub Bilibili 路由](https://rsshub.netlify.app/zh/routes/social-media#bilibili)。若 UP 投稿或关注视频路由常返回 412/503，见 [bilibili-cookie-docker.md](bilibili-cookie-docker.md) 第六节与 [troubleshooting.md](troubleshooting.md)。
+
+**FOLO 内打开关注动态中的视频（不改 RSSHub）**：关注动态条目的链接为 `t.bilibili.com/xxx`。在 FOLO 中点击**条目标题**或使用「在浏览器中打开」，会在浏览器打开该动态页；在浏览器里该页会展示完整内容，可再点击进入对应 bilibili 视频。不要点正文里的封面图（仅为图片，无链接）。若希望正文不显示无法在应用内播放的内嵌播放器，可将订阅地址改为 `.../followings/dynamic/<uid>/embed=0`。
 
 **需要 Cookie 的路由**（如 UP 主动态、关注动态、粉丝、收藏夹、稍后再看等）：
 
