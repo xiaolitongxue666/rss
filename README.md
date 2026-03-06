@@ -18,7 +18,7 @@
 - **部署与使用**：[DEPLOYMENT-STACK.md](DEPLOYMENT-STACK.md) — 构建、启动、环境变量、离线/备选构建流程。
 - **部署计划（操作顺序）**：[docs/deployment-plan.md](docs/deployment-plan.md) — 本地与远程部署步骤、Cookie 配置时机。
 - **B 站 Cookie 配置**：[docs/bilibili-cookie-docker.md](docs/bilibili-cookie-docker.md) — 获取 Cookie、`cookie/` 目录与 `apply-bilibili-cookie.sh`（本地/远程）。
-- **B 站 412/503 故障排查**：[docs/troubleshooting.md](docs/troubleshooting.md) — 风控、Cookie 与 uid 对应、PROXY_URL_REGEX、followings/video 推荐。
+- **故障排查（B 站/微博等）**：[docs/troubleshooting.md](docs/troubleshooting.md) — B 站 412/503、微博 /weibo/friends、PROXY_URL_REGEX、Cookie 获取。
 - **在 FOLO（或其它 RSS 阅读器）中添加订阅源**：[docs/folo-add-feeds.md](docs/folo-add-feeds.md)。
 - **RSSHub 路由与参数**：[docs.rsshub.app](https://docs.rsshub.app/guide/)。
 
@@ -35,6 +35,7 @@
 | `stack-upload-to-server.sh` | 本机打包并上传 tar 到服务器、在服务器上 load（可配置 REMOTE_*） |
 | `stack-images-load.sh` | 服务器从 tar 加载镜像 |
 | `stack-server-update-and-start.sh` | 服务器更新后一键：检查权限 → 加载镜像 → 停旧容器 → 启动 |
+| `upload-cookie-and-apply-remote.sh` | 将 `cookie/`（B 站+微博）上传到服务器、合并 .env、重启 rsshub（推荐远程更新 Cookie） |
 | `apply-bilibili-cookie.sh` | 从 `cookie/` 生成 BILIBILI_COOKIE_<uid> 并合并到 .env（`--local` / `--remote`） |
 | `apply-weibo-cookie.sh` | 从 `cookie/` 生成 WEIBO_COOKIES 并合并到 .env（`--local` / `--remote`） |
 

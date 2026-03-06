@@ -1,6 +1,6 @@
-# B 站 RSS 412/503 与 Cookie 故障排查
+# RSSHub 故障排查（B 站 / 微博等）
 
-本文梳理自建 RSSHub（如 moicen 上的 ai.moicen.com/rss）访问 B 站路由时出现 **412 Precondition Failed** 或 **503** 的常见原因与解决方案，并汇总 [RSSHub 官方 bilibili 相关 issues](https://github.com/DIYgod/RSSHub/issues?q=bilibili) 中的社区经验。完整 Cookie 配置流程见 [bilibili-cookie-docker.md](bilibili-cookie-docker.md)。
+本文梳理自建 RSSHub（如 ai.moicen.com/rss）常见问题：B 站 **412/503**、微博 **/weibo/friends** 报错等，并汇总 [RSSHub 官方 issues](https://github.com/DIYgod/RSSHub/issues) 中的社区经验。B 站完整 Cookie 配置见 [bilibili-cookie-docker.md](bilibili-cookie-docker.md)。
 
 ---
 
@@ -85,10 +85,10 @@
 
 | 脚本/文档 | 说明 |
 |-----------|------|
-| [scripts/apply-bilibili-cookie.sh](../scripts/apply-bilibili-cookie.sh) | 从 cookie/ 生成 BILIBILI_COOKIE_<uid> 并合并到 .env；加 `--remote` 即上传到服务器并重启 rsshub。 |
-| [scripts/apply-bilibili-cookie.sh](../scripts/apply-bilibili-cookie.sh) | 从 cookie 目录生成 `BILIBILI_COOKIE_<uid>` 并合并到 .env；支持 `--local`/`--remote`、`--no-restart`。 |
-| [docs/bilibili-cookie-docker.md](bilibili-cookie-docker.md) | Cookie 获取、格式、多账号、一键部署及 412 风控建议。 |
-| [docs/folo-add-feeds.md](folo-add-feeds.md) | FOLO 中添加订阅源，含 B 站 followings/video 与 UP 投稿说明。 |
+| [scripts/apply-bilibili-cookie.sh](../scripts/apply-bilibili-cookie.sh) | 从 cookie/ 生成 `BILIBILI_COOKIE_<uid>` 并合并到 .env；支持 `--local`/`--remote`、`--no-restart`。 |
+| [scripts/upload-cookie-and-apply-remote.sh](../scripts/upload-cookie-and-apply-remote.sh) | 将 cookie/（B 站+微博）scp 到服务器、合并 .env、重启 rsshub，并清理微博 Redis 缓存；推荐远程更新 Cookie 时使用。 |
+| [docs/bilibili-cookie-docker.md](bilibili-cookie-docker.md) | B 站 Cookie 获取、格式、多账号、一键部署及 412 风控建议。 |
+| [docs/folo-add-feeds.md](folo-add-feeds.md) | FOLO 中添加订阅源，含 B 站、微博、Twitter、YouTube 等。 |
 
 ---
 
@@ -109,3 +109,25 @@
 | [#19893](https://github.com/DIYgod/RSSHub/issues/19893) | 部分 up 主视频抓取失败 | 课程/收费/已删视频导致 pages 未定义；可设 BILIBILI_EXCLUDE_SUBTITLES=true |
 | [#19633](https://github.com/DIYgod/RSSHub/issues/19633) | UP 主投稿 fetch failed | 需完整 Cookie、浏览器 User-Agent；自建并配置 Cookie 后测试 |
 | [#19545](https://github.com/DIYgod/RSSHub/issues/19545) | UP 主动态 503 | BILIBILI_COOKIE_{uid} 为**自己**账号 uid；与 #18506 重复 |
+
+---
+
+## 八、微博 /weibo/friends 报错（503 或 userInfo undefined）
+
+**成功经验**：使用 **m.weibo.cn** 的请求 Cookie（SUB、XSRF-TOKEN、_T_WM、M_WEIBOCN_PARAMS、SSOLoginState、WEIBOCN_FROM 等），整理到 `cookie/weibo_cookies.py` 后执行 `./scripts/upload-cookie-and-apply-remote.sh`，订阅即可正常。
+
+参考 [RSSHub 微博相关 issues](https://github.com/DIYgod/RSSHub/issues?q=weibo)（如 [#20921](https://github.com/DIYgod/RSSHub/issues/20921)、[#20633](https://github.com/DIYgod/RSSHub/issues/20633)、[#20836](https://github.com/DIYgod/RSSHub/issues/20836)），常见原因与应对如下。
+
+| 可能原因 | 说明与做法 |
+|----------|------------|
+| **Cookie 不完整或已失效** | 微博 API 在 Cookie 无效时返回的数据缺少 `data.userInfo`，RSSHub 读取时会报 `TypeError: Cannot read properties of undefined (reading 'userInfo')` 并返回 503。**必须**在 **[m.weibo.cn](https://m.weibo.cn)** 登录后获取 Cookie（不要仅从 weibo.com 或 passport.weibo.com 复制）：F12 → Application → Cookies 选 **m.weibo.cn**，或从 **Network** 任选请求查看 Request Headers 中的 Cookie。**SUB、XSRF-TOKEN** 在 m.weibo.cn 与 weibo.com 可能不同，须使用 m.weibo.cn 的请求 Cookie；建议同时包含 **SUBP、WBPSESS、ALF、_T_WM、M_WEIBOCN_PARAMS、SSOLoginState、WEIBOCN_FROM** 等，若有 **SCF** 则一并加入。整理为 `cookie/weibo_cookies.py` 或 `weibo.txt` 后执行 `./scripts/upload-cookie-and-apply-remote.sh`。Cookie 易在几分钟到几小时内失效，需定期更新。 |
+| **服务器 IP 被微博限制** | 若 RSSHub 部署在海外 VPS，微博可能对 IP/地区限流或返回异常结构。可配置**国内代理**：在 `.env` 中设置 `PROXY_URI`（或本栈已有 Clash 时，通过 `PROXY_URL_REGEX` 让微博直连、仅国外站走代理；若服务器在海外，则需让微博请求走国内代理）。参见 [RSSHub 代理配置](https://docs.rsshub.app/zh/deploy/config#%E4%BB%A3%E7%90%86)、[#20836](https://github.com/DIYgod/RSSHub/issues/20836)。 |
+| **缓存了无效数据** | 若曾用无效 Cookie 请求过，Redis 可能缓存了 `weibo:friends:login-user` 或 `weibo:user:index:undefined`。本栈在执行 `./scripts/upload-cookie-and-apply-remote.sh` 时会自动清理这两个 key；若未通过该脚本更新，可登录服务器执行：`docker compose -f docker-compose.stack.yml exec -T redis redis-cli DEL weibo:friends:login-user weibo:user:index:undefined`，再重试订阅。 |
+
+**重要：微博是否走代理**  
+本栈在 docker-compose 中为 RSSHub 配置了 `PROXY_HOST=clash-with-ui`、`PROXY_PORT=7890`。RSSHub 通过 **PROXY_URL_REGEX** 决定哪些请求走代理：**未设置时默认为 `.*`，即全部请求（含微博 m.weibo.cn）都走 Clash**。若 Clash 出口在海外，微博可能对出口 IP 限流或返回异常。  
+**建议**：在服务器 `.env` 中设置 `PROXY_URL_REGEX=(youtube|twitter|telegram|github\.com|reddit)`（仅国外站走代理），让微博、B 站等国内站直连。修改后执行 `docker compose -f docker-compose.stack.yml up -d rsshub` 生效。
+
+**操作顺序建议**：① 确认 `.env` 中已设 `PROXY_URL_REGEX`，避免微博走海外代理；② 用 **m.weibo.cn** 登录 → F12 → Application/Network 复制 **m.weibo.cn 的请求 Cookie**（SUB、XSRF-TOKEN 等须来自 m.weibo.cn）→ 整理为 `cookie/weibo_cookies.py` 或 `weibo.txt`；③ 执行 `./scripts/upload-cookie-and-apply-remote.sh`（会合并 .env、重启 rsshub、清理微博 Redis 缓存）；④ 若仍报 userInfo 错误，在服务器执行 `grep WEIBO_COOKIES /home/alchemy/RSS/rss/.env` 或 `docker compose -f docker-compose.stack.yml exec rsshub env | grep WEIBO` 确认变量已传入容器；⑤ 若服务器在海外且仍失败，配置国内代理后再试。
+
+**订阅正常但图片/视频在阅读器内不显示**：微博 CDN（sinaimg.cn、weibocdn.com）有防盗链，阅读器直连易 403。在服务器 `.env` 中设置 `HOTLINK_TEMPLATE=https://images.weserv.nl?url=$${href_ue}` 与 `HOTLINK_INCLUDE_PATHS=/weibo` 后重启 rsshub（docker-compose 加载 .env 时须写 `$$` 才能把 `${href_ue}` 原样传给 RSSHub），可将微博描述中的图片重写为代理地址；视频因带有效期与防盗链，建议点击条目在浏览器中打开观看。详见 [RSSHub 图片处理](https://docs.rsshub.app/zh/deploy/config#图片处理)、[folo-add-feeds.md](folo-add-feeds.md) 微博小节，社区讨论见 [#10874](https://github.com/DIYgod/RSSHub/issues/10874)、[#20995](https://github.com/DIYgod/RSSHub/issues/20995)。

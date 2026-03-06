@@ -28,6 +28,8 @@
 
 **合并 2～6 步**：拉代码后可只执行 `./scripts/stack-server-update-and-start.sh`，脚本会依次：检查 Docker 权限 → 加载镜像（若存在 tar）→ 停止旧容器 → 启动栈。
 
+**Cookie 更新**：在本机维护 `cookie/` 后执行 `./scripts/upload-cookie-and-apply-remote.sh`，将 B 站与微博 Cookie 上传并合并到服务器 .env、重启 rsshub。详见 [DEPLOYMENT-STACK.md](../DEPLOYMENT-STACK.md) 与 [troubleshooting.md](troubleshooting.md)。
+
 ## 验证
 
 访问 https://ai.moicen.com/rss/

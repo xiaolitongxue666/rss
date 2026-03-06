@@ -26,12 +26,14 @@
 
 ### 2.1 微博
 
-- **路由**：参考 [RSSHub 社交媒体路由](https://rsshub.netlify.app/zh/routes/social-media)，若官方文档中有「微博」小节（如用户时间线等），将示例中的域名替换为 `https://ai.moicen.com/rss` 即可。
-- **Cookie**：微博路由通常需要 `WEIBO_COOKIES`。
-  - 在**运行 RSSHub 的服务器**上，进入 rss 项目目录，编辑 `.env`，添加：`WEIBO_COOKIES=从浏览器/移动端复制的 Cookie 字符串`。
-  - 获取方式：登录 weibo.com（或移动端），打开开发者工具 → Network → 任选请求 → 复制 Cookie 请求头。
-  - **注意**：若当前使用的 RSSHub 子项目**未包含微博路由**（如本仓库 submodule 中无 weibo 相关路由），则需使用官方 RSSHub 或自建并启用微博路由；此处 Cookie 配置方法供自建实例使用。
-- 微博防盗链可能导致 RSS 内图片无法显示；自建时可配置 `HOTLINK_TEMPLATE`、`HOTLINK_INCLUDE_PATHS`（见 RSSHub 部署文档）。
+- **路由**：参考 [RSSHub 微博路由](https://docs.rsshub.app/routes/social-media#wei-bo)，将示例域名替换为 `https://ai.moicen.com/rss`。例如「最新关注时间线」：`https://ai.moicen.com/rss/weibo/friends`。
+- **Cookie**：`/weibo/friends` 必须使用**登录态 Cookie**，且须为 **m.weibo.cn** 的请求 Cookie（不要仅从 weibo.com 复制）。
+  - **获取方式**：登录 [m.weibo.cn](https://m.weibo.cn) 后，F12 → **Application** → Cookies 选 `m.weibo.cn`，或 **Network** 任选请求 → Request Headers 复制 Cookie。建议包含：`SUB`、`SUBP`、`WBPSESS`、`ALF`、`XSRF-TOKEN`、`_T_WM`、`M_WEIBOCN_PARAMS`、`SSOLoginState`、`WEIBOCN_FROM` 等（SUB/XSRF-TOKEN 在 m.weibo.cn 与 weibo.com 可能不同）。
+  - **本仓库**：将 Cookie 整理为 `cookie/weibo_cookies.py` 或 `cookie/weibo.txt` 后执行 `./scripts/upload-cookie-and-apply-remote.sh`（会合并到服务器 .env、重启 rsshub 并清理微博 Redis 缓存）。故障排查见 [troubleshooting.md](troubleshooting.md) 第八节。
+- **图片/视频在阅读器内不显示**：微博 CDN（sinaimg.cn、weibocdn.com）有防盗链，RSS 阅读器请求时易被拒。自建 RSSHub 时可在服务器 `.env` 中配置 **图片代理** 并重启 rsshub：
+  - `HOTLINK_TEMPLATE=https://images.weserv.nl?url=$${href_ue}`（将描述中的图片 URL 重写为 [images.weserv.nl](https://images.weserv.nl) 代理；通过 docker-compose 加载 .env 时须写双美元符 `$$`，否则 compose 会替换变量）
+  - `HOTLINK_INCLUDE_PATHS=/weibo`（仅对微博路由生效）
+  - 配置说明见 [RSSHub 配置 - 图片处理](https://docs.rsshub.app/zh/deploy/config#图片处理)、[#2769](https://github.com/DIYgod/RSSHub/issues/2769)。**视频**因防盗链与带有效期 URL，在应用内仍可能无法播放，建议点击条目或「在浏览器中打开」到微博观看。
 
 ### 2.2 Bilibili
 

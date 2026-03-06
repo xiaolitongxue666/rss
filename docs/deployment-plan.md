@@ -29,7 +29,7 @@
 | 1 | 在 rss 根目录已配置 `.env`、子项目已初始化 | 同「一、本地部署」步骤 1～2 |
 | 2 | （可选）Cookie：维护 `cookie/` 目录，便于后续 `--remote` 推送 | 见 [bilibili-cookie-docker.md](bilibili-cookie-docker.md) |
 | 3 | `./scripts/stack-upload-to-server.sh` | 打包栈镜像 → scp 到服务器 → ssh 在服务器上 mv + `docker load`；可设 `SKIP_PACK=1` 仅上传已有 tar |
-| 4 | （可选）`./scripts/apply-bilibili-cookie.sh --uid <uid> --remote` | 将 Cookie 合并到**服务器** `.env` 并重启 rsshub；环境变量 REMOTE_USER、REMOTE_HOST、REMOTE_ALCHEMY_DIR 与上传脚本一致 |
+| 4 | （可选）`./scripts/upload-cookie-and-apply-remote.sh` 或 `./scripts/apply-bilibili-cookie.sh --uid <uid> --remote` | 将 `cookie/`（B 站+微博）上传并合并到服务器 .env、重启 rsshub；仅 B 站时可用 apply-bilibili-cookie.sh --remote。环境变量同 [stack-upload-to-server.sh](../scripts/stack-upload-to-server.sh) |
 
 ### 2.2 服务器
 
@@ -54,7 +54,7 @@ flowchart LR
     B[.env + 可选 cookie]
     C[stack-build-and-up 或 stack-from-zero]
     D[stack-upload-to-server]
-    E[apply-bilibili-cookie --remote]
+    E[upload-cookie-and-apply-remote]
   end
   subgraph server [服务器]
     F[docker load]
@@ -81,9 +81,10 @@ flowchart LR
 
 | 场景 | 做法 |
 |------|------|
-| 本地、Cookie 在 `cookie/` 目录 | `./scripts/apply-bilibili-cookie.sh --uid <uid>`（默认合并到本地 .env 并重启 rsshub） |
+| 本地、Cookie 在 `cookie/` 目录 | `./scripts/apply-bilibili-cookie.sh --uid <uid>`（合并到本地 .env 并重启 rsshub）；微博用 `apply-weibo-cookie.sh` |
 | 本地、仅合并不重启 | `./scripts/apply-bilibili-cookie.sh --uid <uid> --no-restart` |
-| 远程、Cookie 在本机 `cookie/` 目录 | `./scripts/apply-bilibili-cookie.sh --uid <uid> --remote`（scp 片段到服务器、合并 .env、ssh 重启 rsshub） |
-| 远程、手动 | 登录服务器 → 编辑 `REMOTE_ALCHEMY_DIR/.env` 添加 `BILIBILI_COOKIE_<uid>=...` → `docker compose -f docker-compose.stack.yml up -d rsshub` |
+| 远程、B 站+微博在 `cookie/` 目录 | **推荐** `./scripts/upload-cookie-and-apply-remote.sh`（scp cookie/ 到服务器、合并 .env、重启 rsshub、清理微博缓存） |
+| 远程、仅 B 站 | `./scripts/apply-bilibili-cookie.sh --uid <uid> --remote` |
+| 远程、手动 | 登录服务器 → 编辑 `.env` 添加 `BILIBILI_COOKIE_<uid>=...` / `WEIBO_COOKIES=...` → `docker compose -f docker-compose.stack.yml up -d rsshub` |
 
-环境变量 `REMOTE_USER`、`REMOTE_HOST`、`REMOTE_ALCHEMY_DIR` 与 [stack-upload-to-server.sh](../scripts/stack-upload-to-server.sh) 一致（默认 `REMOTE_ALCHEMY_DIR=/home/alchemy/RSS`）。
+环境变量 `REMOTE_USER`、`REMOTE_HOST`、`REMOTE_ALCHEMY_DIR` 与 [stack-upload-to-server.sh](../scripts/stack-upload-to-server.sh) 一致（默认 `REMOTE_ALCHEMY_DIR=/home/alchemy/RSS`）。微博 Cookie 获取见 [troubleshooting.md](troubleshooting.md) 第八节。
